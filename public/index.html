@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Custom Links for Stremio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,700;1,9..144,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#e8ebf0; --panel:#f6f7f9; --ink:#14161f; --mute:#5b6070;
+  --rule:#c5cad5; --blue:#2740e8; --ok:#12805c; --bad:#b3261e;
+  --serif:'Fraunces',Georgia,serif; --mono:'JetBrains Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--mono);font-size:14px;line-height:1.5}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.wrap{max-width:760px;margin:0 auto;padding:28px 20px 70px}
+h1{font-family:var(--serif);font-weight:700;font-size:clamp(34px,8vw,54px);line-height:1;letter-spacing:-.02em;margin:0 0 8px}
+h1 em{font-weight:500}
+h2{font-family:var(--serif);font-weight:500;font-size:20px;margin:0 0 10px}
+.sub{color:var(--mute);margin:0 0 22px;max-width:60ch}
+.panel{background:var(--panel);border:1.5px solid var(--ink);border-radius:8px;padding:16px;margin-bottom:18px}
+label{display:grid;gap:4px;font-size:12px;color:var(--mute);margin-bottom:10px}
+input{width:100%;border:1.5px solid var(--ink);border-radius:6px;background:#fff;padding:9px 10px}
+.btn{border:1.5px solid var(--ink);background:var(--panel);border-radius:6px;padding:9px 14px;text-decoration:none;display:inline-block}
+.btn:hover{background:var(--ink);color:var(--paper)}
+.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn.primary:hover{background:#1a2ec0;border-color:#1a2ec0}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.msg{min-height:20px;font-size:12px;margin:8px 0 0;color:var(--mute)}
+.msg.bad{color:var(--bad)} .msg.ok{color:var(--ok)}
+.at{display:flex;align-items:stretch;gap:0;margin-bottom:10px}
+.at span{border:1.5px solid var(--ink);border-right:0;border-radius:6px 0 0 6px;background:var(--rule);padding:9px 10px}
+.at input{border-radius:0 6px 6px 0}
+.row{display:flex;gap:6px;align-items:center;padding:9px 0;border-bottom:1px solid var(--rule)}
+.row:last-child{border-bottom:0}
+.row div{flex:1;min-width:0}
+.row b{display:block;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row small{display:block;color:var(--mute);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row button{border:0;background:none;padding:4px 8px}
+.row .del{color:var(--bad)} .row .edit{color:var(--blue)}
+.empty{color:var(--mute)}
+code{display:block;word-break:break-all;font-size:12px;background:#fff;border:1.5px solid var(--rule);border-radius:6px;padding:10px;margin-bottom:10px}
+ol{margin:0;padding-left:20px;color:var(--mute)}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Custom <em>Links</em></h1>
+  <p class="sub" id="sub">Add your own HTTP links to Stremio. Every person gets a personal page and addon URL, protected by their own password.</p>
+
+  <!-- Home -->
+  <div id="home" hidden>
+    <section class="panel">
+      <h2>Open or create your page</h2>
+      <label>Choose a username
+        <div class="at"><span>@</span><input id="hName" placeholder="yourname" maxlength="20" autocapitalize="none" autocomplete="off"></div>
+      </label>
+      <button class="btn primary" id="go">Continue</button>
+      <div class="msg" id="hMsg"></div>
+    </section>
+    <section class="panel">
+      <h2>How it works</h2>
+      <ol>
+        <li>Pick a username and set a password.</li>
+        <li>Add your links on your page.</li>
+        <li>Install your addon URL in Stremio.</li>
+      </ol>
+    </section>
+  </div>
+
+  <!-- New user -->
+  <section class="panel" id="claim" hidden>
+    <h2>Create your page</h2>
+    <p class="sub" style="margin-bottom:12px">This username is free. Set a password for it. A lost password can't be reset, so keep it safe.</p>
+    <label>Password
+      <input id="cPw" type="password" autocomplete="new-password">
+    </label>
+    <label>Repeat password
+      <input id="cPw2" type="password" autocomplete="new-password">
+    </label>
+    <button class="btn primary" id="create">Create page</button>
+    <div class="msg" id="cMsg"></div>
+  </section>
+
+  <!-- Existing user -->
+  <section class="panel" id="login" hidden>
+    <h2>Enter your password</h2>
+    <label>Password
+      <input id="lPw" type="password" autocomplete="current-password">
+    </label>
+    <button class="btn primary" id="unlock">Unlock</button>
+    <div class="msg" id="lMsg"></div>
+  </section>
+
+  <!-- Manager -->
+  <div id="app" hidden>
+    <section class="panel">
+      <h2 id="formTitle">Add a link</h2>
+      <label>Title shown in Stremio
+        <input id="fTitle" placeholder="e.g. Inception - 1080p">
+      </label>
+      <label>Link
+        <input id="fUrl" type="url" placeholder="https://example.com/video.mp4">
+      </label>
+      <div class="actions">
+        <button class="btn primary" id="add">Add link</button>
+        <button class="btn" id="cancel" hidden>Cancel edit</button>
+      </div>
+      <div class="msg" id="msg"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Your links</h2>
+      <div id="list"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Install in Stremio</h2>
+      <code id="manifestUrl"></code>
+      <div class="actions">
+        <a class="btn primary" id="open">Install in Stremio</a>
+        <button class="btn" id="copy">Copy install URL</button>
+        <button class="btn" id="lock">Lock page</button>
+      </div>
+      <div class="msg">Changes show up in Stremio right away, no reinstall needed.</div>
+    </section>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const NAME_RE = /^[a-z0-9_]{3,20}$/;
+const m = location.pathname.match(/^\/@([A-Za-z0-9_]{3,20})(?:\/configure)?\/?$/);
+const user = m ? m[1].toLowerCase() : null;
+let password = '';          // kept in memory only; a reload asks again
+let links = [];
+let editingId = null;
+
+function setMsg(id, t, cls){ const e = $(id); e.textContent = t; e.className = 'msg ' + (cls || ''); }
+function show(which){
+  ['home', 'claim', 'login', 'app'].forEach(k => $(k).hidden = k !== which);
+}
+
+async function post(path, body){
+  const r = await fetch(path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  const j = await r.json().catch(() => ({}));
+  if(!r.ok){ const e = new Error(j.error || 'Request failed'); e.status = r.status; throw e; }
+  return j;
+}
+const call = (action, extra) => post('/api/links', { name: user, password, action, ...extra });
+
+/* ---------- Home ---------- */
+function startHome(){
+  show('home');
+  if(location.pathname.startsWith('/@')) setMsg('hMsg', 'That username is not valid. Use 3-20 letters, numbers or underscores.', 'bad');
+  const go = () => {
+    const n = $('hName').value.trim().replace(/^@/, '').toLowerCase();
+    if(!NAME_RE.test(n)) return setMsg('hMsg', 'Use 3-20 letters, numbers or underscores.', 'bad');
+    location.href = '/@' + n;
+  };
+  $('go').onclick = go;
+  $('hName').addEventListener('keydown', e => { if(e.key === 'Enter') go(); });
+}
+
+/* ---------- User page ---------- */
+async function startUser(){
+  $('sub').textContent = '@' + user;
+  try{
+    const r = await fetch('/api/user?name=' + user);
+    const j = await r.json();
+    if(!r.ok) throw new Error(j.error);
+    if(j.exists){ show('login'); $('lPw').focus(); }
+    else show('claim');
+  }catch(e){
+    show('login'); setMsg('lMsg', 'Could not reach the server. ' + e.message, 'bad');
+  }
+}
+
+$('create').onclick = async () => {
+  const p1 = $('cPw').value, p2 = $('cPw2').value;
+  if(p1.length < 6) return setMsg('cMsg', 'Password must be at least 6 characters.', 'bad');
+  if(p1 !== p2) return setMsg('cMsg', 'Passwords do not match.', 'bad');
+  try{
+    await post('/api/user', { name: user, password: p1 });
+    password = p1; $('cPw').value = $('cPw2').value = '';
+    await enter();
+  }catch(e){ setMsg('cMsg', e.message, 'bad'); }
+};
+
+async function tryUnlock(){
+  password = $('lPw').value;
+  try{ await enter(); $('lPw').value = ''; }
+  catch(e){ password = ''; setMsg('lMsg', e.message, 'bad'); }
+}
+$('unlock').onclick = tryUnlock;
+$('lPw').addEventListener('keydown', e => { if(e.key === 'Enter') tryUnlock(); });
+
+async function enter(){
+  links = await call('list');
+  show('app'); render();
+  const path = '/@' + user + '/manifest.json';
+  $('manifestUrl').textContent = location.origin + path;
+  $('open').href = 'stremio://' + location.host + path;
+}
+
+function render(){
+  const list = $('list'); list.innerHTML = '';
+  if(!links.length){
+    const e = document.createElement('div'); e.className = 'empty';
+    e.textContent = 'No links yet. Add your first one above.';
+    list.appendChild(e);
+  }
+  links.forEach(l => {
+    const row = document.createElement('div'); row.className = 'row';
+    const d = document.createElement('div');
+    const b = document.createElement('b'); b.textContent = l.title;
+    const s = document.createElement('small'); s.textContent = l.url;
+    d.append(b, s);
+    const ed = document.createElement('button'); ed.className = 'edit'; ed.textContent = 'Edit';
+    ed.onclick = () => startEdit(l);
+    const del = document.createElement('button'); del.className = 'del'; del.textContent = 'Delete';
+    del.onclick = async () => {
+      try{ links = await call('delete', { id: l.id }); if(editingId === l.id) stopEdit(); render(); }
+      catch(e){ setMsg('msg', e.message, 'bad'); }
+    };
+    row.append(d, ed, del);
+    list.appendChild(row);
+  });
+}
+
+function startEdit(l){
+  editingId = l.id;
+  $('fTitle').value = l.title; $('fUrl').value = l.url;
+  $('formTitle').textContent = 'Edit link';
+  $('add').textContent = 'Save changes';
+  $('cancel').hidden = false;
+  setMsg('msg', '');
+  $('fTitle').focus();
+}
+function stopEdit(){
+  editingId = null;
+  $('fTitle').value = ''; $('fUrl').value = '';
+  $('formTitle').textContent = 'Add a link';
+  $('add').textContent = 'Add link';
+  $('cancel').hidden = true;
+}
+
+$('add').onclick = async () => {
+  const title = $('fTitle').value.trim(), url = $('fUrl').value.trim();
+  if(!title) return setMsg('msg', 'Enter a title.', 'bad');
+  try{
+    links = editingId
+      ? await call('update', { id: editingId, title, url })
+      : await call('add', { title, url });
+    setMsg('msg', editingId ? 'Changes saved.' : 'Link added.', 'ok');
+    stopEdit(); render();
+  }catch(e){
+    if(e.status === 401){ password = ''; show('login'); setMsg('lMsg', 'Session expired. Enter your password again.', 'bad'); }
+    else setMsg('msg', e.message, 'bad');
+  }
+};
+$('cancel').onclick = () => { stopEdit(); setMsg('msg', ''); };
+
+$('copy').onclick = async () => {
+  const u = location.origin + '/@' + user + '/manifest.json';
+  try{ await navigator.clipboard.writeText(u); setMsg('msg', 'Install URL copied.', 'ok'); }
+  catch{ prompt('Copy this URL', u); }
+};
+$('lock').onclick = () => location.reload();
+
+if(user) startUser(); else startHome();
+</script>
+</body>
+</html>
