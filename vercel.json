@@ -3,9 +3,41 @@
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "Access-Control-Allow-Origin", "value": "*" },
-        { "key": "Access-Control-Allow-Headers", "value": "*" }
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "*"
+        }
       ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/@:username/manifest.json",
+      "destination": "/api/addon?u=:username&r=manifest"
+    },
+    {
+      "source": "/@:username/catalog/:type/:id.json",
+      "destination": "/api/addon?u=:username&r=catalog"
+    },
+    {
+      "source": "/@:username/meta/:type/:id.json",
+      "destination": "/api/addon?u=:username&r=meta"
+    },
+    {
+      "source": "/@:username/stream/:type/:id.json",
+      "destination": "/api/addon?u=:username&r=stream"
+    },
+    {
+      "source": "/@:username/configure",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/@:username",
+      "destination": "/index.html"
     }
   ]
 }
