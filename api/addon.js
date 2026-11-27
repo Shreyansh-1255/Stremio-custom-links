@@ -44,7 +44,7 @@ module.exports = async (req, res) => {
     if (route === 'manifest') {
       return L.send(res, 200, {
         id: `community.custom.links.${name}`,
-        version: '5.2.0',
+        version: '5.3.0',
         name: `Custom Links @${name}`,
         description: `Your own video links attached to movies and series by @${name}.`,
         resources: [
