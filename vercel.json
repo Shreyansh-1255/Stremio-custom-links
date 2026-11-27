@@ -25,11 +25,11 @@
     },
     {
       "source": "/@:username/meta/:type/:id.json",
-      "destination": "/api/addon?u=:username&r=meta"
+      "destination": "/api/addon?u=:username&r=meta&type=:type&id=:id"
     },
     {
       "source": "/@:username/stream/:type/:id.json",
-      "destination": "/api/addon?u=:username&r=stream"
+      "destination": "/api/addon?u=:username&r=stream&type=:type&id=:id"
     },
     {
       "source": "/@:username/configure",
