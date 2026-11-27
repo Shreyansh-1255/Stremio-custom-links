@@ -14,6 +14,31 @@ async function cinemeta(type, query) {
   return Array.isArray(j.metas) ? j.metas : [];
 }
 
+// IMDb suggestion API: /suggestion/<first letter>/<query>.json
+const IMDB_TYPES = {
+  movie: 'movie', tvMovie: 'movie', tvSpecial: 'movie', video: 'movie', short: 'movie', tvShort: 'movie',
+  tvSeries: 'series', tvMiniSeries: 'series'
+};
+async function imdbSuggest(query) {
+  const key = query.toLowerCase().trim();
+  const first = (key.match(/[a-z0-9]/) || [])[0];
+  if (!first) return [];
+  const url = 'https://v3.sg.media-imdb.com/suggestion/' + first + '/' + encodeURIComponent(key) + '.json';
+  const r = await fetch(url, { signal: AbortSignal.timeout(7000) });
+  if (!r.ok) throw new Error('IMDb HTTP ' + r.status);
+  const j = await r.json();
+  return (Array.isArray(j.d) ? j.d : [])
+    .filter(m => m && /^tt\d+$/.test(String(m.id || '')) && IMDB_TYPES[m.qid])
+    .map(m => ({
+      imdb: String(m.id).toLowerCase(),
+      type: IMDB_TYPES[m.qid],
+      name: String(m.l || '').slice(0, 200),
+      year: m.yr ? String(m.yr) : (m.y ? String(m.y) : ''),
+      poster: m.i && m.i.imageUrl ? String(m.i.imageUrl).replace(/\._V1_.*\.(jpg|png)$/i, '._V1_UX300_.jpg') : ''
+    }))
+    .filter(m => m.name);
+}
+
 function pick(metas) {
   return metas
     .filter(m => m && /^tt\d+$/.test(String(m.imdb_id || '')))
@@ -36,15 +61,32 @@ module.exports = async (req, res) => {
     const type = (q.type === 'movie' || q.type === 'series') ? q.type : 'all';
     if (!query) return L.send(res, 200, { results: [] });
 
-    const cacheKey = `search:${type}:${query.toLowerCase()}`;
+    const cacheKey = `search2:${type}:${query.toLowerCase()}`;
     try {
       const cached = await L.cmd(['GET', cacheKey]);
       if (cached) return L.send(res, 200, { results: JSON.parse(cached) });
     } catch (_) { /* fall through to a live search */ }
 
     const types = type === 'all' ? ['movie', 'series'] : [type];
-    const metas = await Promise.all(types.map(t => cinemeta(t, query).catch(() => [])));
-    const results = metas.flatMap(pick).slice(0, 20);
+    const [imdbAll, ...metas] = await Promise.all([
+      imdbSuggest(query).catch(() => []),
+      ...types.map(t => cinemeta(t, query).catch(() => []))
+    ]);
+    const fromImdb = imdbAll.filter(m => type === 'all' || m.type === type);
+    const seen = new Set(), results = [];
+    const cine = new Map(metas.flatMap(pick).map(m => [m.imdb, m]));
+    for (const m of fromImdb) {
+      if (seen.has(m.imdb)) continue;
+      seen.add(m.imdb);
+      const c = cine.get(m.imdb);
+      results.push({ ...m, poster: m.poster || (c && c.poster) || '', year: m.year || (c && c.year) || '' });
+    }
+    for (const m of cine.values()) {
+      if (seen.has(m.imdb)) continue;
+      seen.add(m.imdb);
+      results.push(m);
+    }
+    results.length = Math.min(results.length, 20);
 
     try { await L.cmd(['SET', cacheKey, JSON.stringify(results), 'EX', String(TTL)]); } catch (_) {}
     return L.send(res, 200, { results });
