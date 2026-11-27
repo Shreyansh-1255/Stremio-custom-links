@@ -11,7 +11,6 @@
 // always shown — there is no setting to turn it off.
 const L = require('./_lib');
 
-const NO_LINK_MSG = 'no link added in this title';
 
 function toStream(l) {
   return {
@@ -21,12 +20,16 @@ function toStream(l) {
   };
 }
 
-function noLinkCard() {
+function baseUrl(req) {
+  const host = String(req.headers['x-forwarded-host'] || req.headers.host || '').split(',')[0].trim();
+  return /^[a-z0-9.-]+(:\d+)?$/i.test(host) ? `https://${host}` : 'https://stremio-custom-links.vercel.app';
+}
+
+function noLinkCard(req, name) {
   return {
-    name: 'Custom Links',
-    description: NO_LINK_MSG,
-    url: 'https://example.com/',
-    behaviorHints: { notWebReady: true }
+    name: 'No links found',
+    description: 'Click here to add new links',
+    externalUrl: `${baseUrl(req)}/@${name}`
   };
 }
 
@@ -44,13 +47,14 @@ module.exports = async (req, res) => {
     if (route === 'manifest') {
       return L.send(res, 200, {
         id: `community.custom.links.${name}`,
-        version: '5.3.0',
+        version: '5.4.0',
         name: `Custom Links @${name}`,
         description: `Your own video links attached to movies and series by @${name}.`,
         resources: [
           { name: 'stream', types: ['movie', 'series'], idPrefixes: ['tt'] }
         ],
         types: ['movie', 'series'],
+        catalogs: [],
         behaviorHints: { configurable: true }
       });
     }
@@ -66,7 +70,7 @@ module.exports = async (req, res) => {
           String(l.imdb || '').toLowerCase() === base &&
           // links saved for a specific episode only show on that episode
           (!l.se || (s !== null && e !== null && Number(l.se) === s && Number(l.ep) === e)));
-        streams = mine.length ? mine.map(toStream) : [noLinkCard()];
+        streams = mine.length ? mine.map(toStream) : [noLinkCard(req, name)];
       }
       return L.send(res, 200, { streams, cacheMaxAge: 0 });
     }
