@@ -1,4 +1,4 @@
-# Stremio Custom Links (v5.5.0)
+# Stremio Custom Links (v5.6.0)
 
 A Stremio addon (works in Nuvio too) to attach your own video links to movies and series. Titles are found by **searching the name** (IMDb suggestions first, then Cinemeta). The addon has **no catalog and no poster of its own** — every link plays directly on the original movie/series card. Every user gets a personal page and install URL, protected by their own password. Built without the Stremio addon SDK.
 
@@ -6,7 +6,7 @@ A Stremio addon (works in Nuvio too) to attach your own video links to movies an
 
 - `/` : if you are already logged in (cookie), you go straight to your page `/@username` — no username/password asked. Otherwise the login screen opens.
 - `/@username` : login screen with two tabs, **Log in** and **Register**. The username field has a fixed `@` in front and shows your page URL live. You stay logged in with a 30-day cookie (renewed every visit) until you press **Logout**.
-- `/@username/manifest.json` : your addon install URL — works in Stremio and Nuvio (the page has **Install in Stremio** and **Install in Nuvio** buttons)
+- `/@username/<key>/manifest.json` : your addon install URL — works in Stremio and Nuvio (the page has **Install in Stremio** and **Install in Nuvio** buttons). `<key>` is a secret 32-character key made for your account, so only people who have the full URL can see your links. **New URL** on the page makes a new key and the old URL stops working. (Accounts that never opened their page yet keep working without a key until they do.)
 
 ## Streams
 
@@ -46,6 +46,10 @@ Vercel serverless functions, Upstash Redis, plain HTML. No dependencies.
 ## Notes
 
 - Passwords are hashed with scrypt. Lost passwords can't be reset.
-- Install URLs are public: anyone with your URL can see your links, but not change them.
+- Keep your install URL private: it contains the secret key, and anyone who has it can see your links (video URLs may contain tokens), but not change them.
 - Search and meta results are cached in Redis for 10 minutes. No request limits — even one typed character searches.
 - Each link stores the title's poster (for the manager page list only — the addon itself adds no catalog).
+
+## Link expiry
+
+Some links (for example TorBox CDN links) carry an expiry time inside their `token`. The page reads it in your browser and shows **Expires in 40 min** / **Link expired** on each card, plus a warning above the list. Edit the link and paste a fresh one: if the video file is the same, its size and subtitle hash are kept.
