@@ -1,7 +1,7 @@
 // GET /api/search?q=<name>&type=all|movie|series
 // Searches Cinemeta by movie/series name so the website can attach a link to
-// a real title. Results are cached in Redis for 10 minutes; 30 searches per
-// IP per minute.
+// a real title. Even one character is searched; results are cached in Redis
+// for 10 minutes. No rate limit.
 const L = require('./_lib');
 
 const TTL = 600;
@@ -34,12 +34,7 @@ module.exports = async (req, res) => {
     const q = req.query || Object.fromEntries(new URL(req.url, 'http://x').searchParams);
     const query = String(q.q || '').trim().slice(0, 100);
     const type = (q.type === 'movie' || q.type === 'series') ? q.type : 'all';
-    if (query.length < 3) return L.send(res, 200, { results: [] });
-
-    // 30 searches per IP per minute
-    if ((await L.hit(`rl:search:${L.ipOf(req)}`, 60)) > 30) {
-      return L.send(res, 429, { error: 'Too many searches. Try again in a minute.' });
-    }
+    if (!query) return L.send(res, 200, { results: [] });
 
     const cacheKey = `search:${type}:${query.toLowerCase()}`;
     try {
