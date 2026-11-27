@@ -1,4 +1,4 @@
-# Stremio Custom Links (v5.2)
+# Stremio Custom Links (v5.3)
 
 A Stremio addon (works in Nuvio too) to attach your own video links to movies and series. Titles are found by **searching the name** (Cinemeta). The addon has **no catalog and no poster of its own** — every link plays directly on the original movie/series card. Every user gets a personal page and install URL, protected by their own password. Built without the Stremio addon SDK.
 
@@ -15,7 +15,7 @@ On any movie or series page, the addon shows a card per link:
 - **description** : the text you pasted when adding the link
 - **url** : your direct video link
 
-A series link shows on every episode by default; turn off **All episodes** to pin it to one season + episode. If a title has no link, a card saying **"no link added in this title"** is always shown — there is no setting to turn it off.
+A series link shows on every episode by default; turn off **All episodes** to pick a season and episode from dropdowns filled by Cinemeta (`/api/meta`, episode names included) — the link then shows only on that episode. If a title has no link, a card saying **"no link added in this title"** is always shown — there is no setting to turn it off.
 
 ## Login sessions
 
@@ -36,5 +36,5 @@ Vercel serverless functions, Upstash Redis, plain HTML. No dependencies.
 
 - Passwords are hashed with scrypt. Lost passwords can't be reset.
 - Install URLs are public: anyone with your URL can see your links, but not change them.
-- Search results are cached in Redis for 10 minutes; 30 searches per IP per minute.
+- Search and meta results are cached in Redis for 10 minutes; search and meta are limited to 30 requests per IP per minute each.
 - Each link stores the title's poster (for the manager page list only — the addon itself adds no catalog).
