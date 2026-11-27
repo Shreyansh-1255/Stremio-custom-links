@@ -38,8 +38,9 @@ main{max-width:480px;margin:0 auto;padding:24px 16px 64px}
 .logged{color:var(--muted);font-size:12.5px;margin:2px 0 0}
 .logged b{color:var(--text);font-weight:600}
 label{display:block;font-size:11px;color:var(--muted);margin:10px 0 5px}
-input,textarea{display:block;width:100%;font-size:13px;padding:10px 11px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;color:var(--text);outline:none;font-family:inherit}
-input:focus,textarea:focus{border-color:var(--gold)}
+input,textarea,select{display:block;width:100%;font-size:13px;padding:10px 11px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;color:var(--text);outline:none;font-family:inherit}
+input:focus,textarea:focus,select:focus{border-color:var(--gold)}
+select option{background:var(--surface-2);color:var(--text)}
 .static{font-size:13px;padding:9px 11px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px}
 .urlbox{font-size:12.5px;word-break:break-all;margin-bottom:0}
 .actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
@@ -55,6 +56,7 @@ input:focus,textarea:focus{border-color:var(--gold)}
 .note{font-size:11px;color:var(--muted);line-height:1.5;margin:14px 0 0}
 .count{font-size:11px;color:var(--muted);border:1px solid var(--line);border-radius:99px;padding:2px 8px;margin-left:8px;vertical-align:middle;font-family:'DM Sans',sans-serif}
 .ep-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.ep-load{font-size:12px;color:var(--muted);margin-top:10px}
 
 /* ---------- toggle (OpenStream switch) ---------- */
 .toggle-row{display:flex;align-items:center;gap:12px;padding:10px 11px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;margin-top:14px}
@@ -183,12 +185,19 @@ input:focus,textarea:focus{border-color:var(--gold)}
       <h2 id="formTitle">Add the link</h2>
       <p class="desc" id="formDesc">It will appear as a play card on the title you selected above.</p>
       <div class="toggle-row" id="epRow" hidden>
-        <div class="tx"><b>All episodes</b><small>Off = the link shows only on the season and episode below.</small></div>
+        <div class="tx"><b>All episodes</b><small>Off = pick the season and episode below.</small></div>
         <button type="button" class="switch" id="epSwitch" role="switch" aria-checked="true" aria-label="All episodes"><i></i></button>
       </div>
-      <div class="ep-grid" id="epFields" hidden>
-        <label>Season <input id="fSe" type="number" inputmode="numeric" min="1" max="999" placeholder="1"></label>
-        <label>Episode <input id="fEp" type="number" inputmode="numeric" min="1" max="999" placeholder="2"></label>
+      <div id="epFields" hidden>
+        <div class="ep-load" id="epLoad" hidden>Loading episodes&hellip;</div>
+        <div class="ep-grid" id="epMetaBox" hidden>
+          <label>Season <select id="epSelSeason"></select></label>
+          <label>Episode <select id="epSelEpisode"></select></label>
+        </div>
+        <div class="ep-grid" id="epNumBox">
+          <label>Season <input id="fSe" type="number" inputmode="numeric" min="1" max="999" placeholder="1"></label>
+          <label>Episode <input id="fEp" type="number" inputmode="numeric" min="1" max="999" placeholder="2"></label>
+        </div>
       </div>
       <label>Description shown under the title
         <textarea id="fDesc" maxlength="300" placeholder="e.g. The.Shawshank.Redemption.1994.720p.BluRay.Hindi.English.DD5.1.x264.ESubs.mkv"></textarea>
@@ -248,6 +257,11 @@ let selected = null;        // { imdb, type, name, year, poster }
 let searchTimer = null;
 let searchSeq = 0;
 let qType = 'all';
+let epWant = null;          // preselect this {se, ep} once the dropdowns fill (edit mode)
+let epImdb = null;          // imdb whose seasons are currently loaded
+let epSeasons = null;       // seasons for epImdb (null = loading or unavailable)
+let epLoading = false;
+const epMetaCache = new Map(); // imdb -> seasons array or null
 
 /* ---------- helpers ---------- */
 function setMsg(id, t, cls){ const e = $(id); e.textContent = t; e.className = 'msg' + (cls ? ' ' + cls : ''); }
@@ -387,7 +401,7 @@ function renderResults(list){
     meta.append(y, dot, ty);
     info.append(title, meta);
     btn.appendChild(info);
-    btn.onclick = () => { selected = r; renderSelected(); updateEpUI(); $('results').innerHTML = ''; $('q').value = ''; $('qClear').classList.remove('show'); setMsg('msg', ''); $('fDesc').focus(); };
+    btn.onclick = () => { selected = r; renderSelected(); updateEpUI(); if(r.type === 'series') ensureEpMeta(r.imdb); $('results').innerHTML = ''; $('q').value = ''; $('qClear').classList.remove('show'); setMsg('msg', ''); $('fDesc').focus(); };
     box.appendChild(btn);
   });
 }
@@ -432,12 +446,87 @@ $('pills').addEventListener('click', e => {
   if($('q').value.trim().length >= 3) doSearch();
 });
 
-/* ---------- episode picker (series only) ---------- */
+/* ---------- episode picker (series only, seasons from Cinemeta) ---------- */
 function epSwitchOn(){ return $('epSwitch').getAttribute('aria-checked') === 'true'; }
+
+function renderEpPickers(){
+  const have = Array.isArray(epSeasons) && epSeasons.length > 0;
+  $('epLoad').hidden = !epLoading;
+  $('epMetaBox').hidden = !have;
+  $('epNumBox').hidden = have || epLoading; // numbers appear only as fallback when Cinemeta has no episodes
+  if(have) fillEpSelects();
+}
+
+function fillEpSelects(){
+  const ss = $('epSelSeason');
+  ss.innerHTML = '';
+  epSeasons.forEach(se => {
+    const o = document.createElement('option');
+    o.value = String(se.s);
+    o.textContent = 'Season ' + se.s + ' (' + se.eps.length + ')';
+    ss.appendChild(o);
+  });
+  const want = (epWant && [...ss.options].some(o => o.value === String(epWant.se))) ? String(epWant.se) : (ss.options[0] ? ss.options[0].value : null);
+  if(want) ss.value = want;
+  fillEpisodes();
+}
+
+function fillEpisodes(){
+  const s = Number($('epSelSeason').value);
+  const season = epSeasons.find(x => x.s === s) || { eps: [] };
+  const es = $('epSelEpisode');
+  es.innerHTML = '';
+  season.eps.forEach(ep => {
+    const o = document.createElement('option');
+    o.value = String(ep.e);
+    o.textContent = 'E' + ep.e + (ep.name ? ' \u00b7 ' + ep.name : '');
+    es.appendChild(o);
+  });
+  if(epWant && epWant.se === s && [...es.options].some(o => o.value === String(epWant.ep))){
+    es.value = String(epWant.ep);
+    epWant = null; // applied once — later manual changes stick
+  }else if(es.options.length) es.selectedIndex = 0;
+}
+$('epSelSeason').addEventListener('change', fillEpisodes);
+
+async function ensureEpMeta(imdb){
+  if(!epMetaCache.has(imdb)){
+    let seasons = null;
+    try{
+      const r = await fetch('/api/meta?imdb=' + encodeURIComponent(imdb));
+      const j = await r.json();
+      seasons = (r.ok && Array.isArray(j.seasons) && j.seasons.length) ? j.seasons : null;
+    }catch(_){ seasons = null; }
+    epMetaCache.set(imdb, seasons);
+  }
+  // refresh the picker if this title is still selected and its picker is visible
+  if(selected && selected.imdb === imdb && epImdb === imdb && !$('epFields').hidden){
+    epLoading = false;
+    epSeasons = epMetaCache.get(imdb);
+    renderEpPickers();
+  }
+}
+
 function updateEpUI(){
   const isSeries = !!(selected && selected.type === 'series');
   $('epRow').hidden = !isSeries;
   $('epFields').hidden = !isSeries || epSwitchOn();
+  if(isSeries && !epSwitchOn()){
+    const imdb = selected.imdb;
+    if(epImdb !== imdb){
+      epImdb = imdb;
+      if(epMetaCache.has(imdb)){
+        epLoading = false;
+        epSeasons = epMetaCache.get(imdb);
+        renderEpPickers();
+      }else{
+        epLoading = true;
+        epSeasons = null;
+        renderEpPickers();
+        ensureEpMeta(imdb);
+      }
+    }else renderEpPickers();
+  }
 }
 $('epSwitch').addEventListener('click', () => {
   $('epSwitch').setAttribute('aria-checked', String(!epSwitchOn()));
@@ -490,6 +579,8 @@ function startEdit(l){
   $('epSwitch').setAttribute('aria-checked', String(!(selected && l.se)));
   $('fSe').value = (selected && l.se) ? l.se : '';
   $('fEp').value = (selected && l.se) ? l.ep : '';
+  epWant = (selected && l.se) ? { se: l.se, ep: l.ep } : null;
+  epImdb = null; // let updateEpUI (re)load the season dropdowns for this title
   $('formTitle').textContent = 'Edit link';
   $('formDesc').textContent = l.imdb
     ? 'Change the description or the video link, then save.'
@@ -506,6 +597,7 @@ function stopEdit(){
   $('fDesc').value = ''; $('fUrl').value = '';
   $('epSwitch').setAttribute('aria-checked', 'true');
   $('fSe').value = ''; $('fEp').value = '';
+  epWant = null; epImdb = null; epSeasons = null; epLoading = false;
   $('formTitle').textContent = 'Add the link';
   $('formDesc').textContent = 'It will appear as a play card on the title you selected above.';
   $('add').textContent = 'Add link';
@@ -525,9 +617,10 @@ $('add').onclick = async () => {
   if(!desc) return setMsg('msg', 'Enter the description.', 'err');
   let se = null, ep = null;
   if(selected.type === 'series' && !epSwitchOn()){
-    se = Number($('fSe').value); ep = Number($('fEp').value);
+    if(!$('epMetaBox').hidden){ se = Number($('epSelSeason').value); ep = Number($('epSelEpisode').value); }
+    else { se = Number($('fSe').value); ep = Number($('fEp').value); }
     if(!Number.isInteger(se) || !Number.isInteger(ep) || se < 1 || ep < 1 || se > 999 || ep > 999){
-      return setMsg('msg', 'Enter the season and episode numbers (1-999).', 'err');
+      return setMsg('msg', 'Pick the season and episode, or keep "All episodes" on.', 'err');
     }
   }
   const payload = { id: editingId, imdb: selected.imdb, type: selected.type, metaName: selected.name, desc, url, poster: selected.poster || '', se, ep };
