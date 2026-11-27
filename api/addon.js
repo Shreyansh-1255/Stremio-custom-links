@@ -12,12 +12,30 @@
 const L = require('./_lib');
 
 
+// Stremio hands behaviorHints videoHash / videoSize / filename to subtitle addons
+// (OpenSubtitles etc.) so they can find subtitles for this exact file.
+const VIDEO_EXT = /\.(mkv|mp4|avi|webm|mov|m4v|ts|m2ts|wmv|flv|mpe?g)$/i;
+
+function pickFilename(l) {
+  const d = String(l.desc || '').split('\n')[0].trim();
+  if (VIDEO_EXT.test(d)) return d;      // description looks like the file name
+  if (l.fname) return String(l.fname);  // else the name read from the video URL
+  return d || null;
+}
+
 function toStream(l) {
-  return {
+  const stream = {
     name: String(l.name || 'Custom Links').trim(),
     description: String(l.desc || l.title || l.url).trim(),
     url: l.url
   };
+  const hints = {};
+  if (Number(l.size) > 0) hints.videoSize = Number(l.size);
+  if (/^[a-f0-9]{16}$/.test(String(l.hash || ''))) hints.videoHash = l.hash;
+  const fn = pickFilename(l);
+  if (fn) hints.filename = fn;
+  if (Object.keys(hints).length) stream.behaviorHints = hints;
+  return stream;
 }
 
 function baseUrl(req) {
@@ -47,7 +65,7 @@ module.exports = async (req, res) => {
     if (route === 'manifest') {
       return L.send(res, 200, {
         id: `community.custom.links.${name}`,
-        version: '5.4.1',
+        version: '5.5.0',
         name: `Custom Links @${name}`,
         description: `Your own video links attached to movies and series by @${name}.`,
         resources: [
