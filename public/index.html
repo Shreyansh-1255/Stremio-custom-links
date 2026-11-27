@@ -171,6 +171,8 @@ input:focus-visible,textarea:focus-visible,select:focus-visible{outline:none}
 .link-row .li small.host{font-size:11px;opacity:.7;margin-top:3px}
 .tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:5px}
 .tags .count{margin:0;padding:1px 8px}
+.count.bad{color:var(--danger-ink);border-color:var(--danger)}
+.count.warn{color:var(--gold);border-color:var(--gold)}
 .rowbtns{margin-top:auto;padding-top:10px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
 .rowbtns button{height:32px;padding:0 4px;font-size:11.5px;white-space:nowrap}
 .more{display:block;width:100%;margin-top:10px}
@@ -275,6 +277,7 @@ input:focus-visible,textarea:focus-visible,select:focus-visible{outline:none}
       </label>
       <label>Video link
         <input id="fUrl" type="url" placeholder="https://example.com/video.mkv" autocapitalize="none" autocorrect="off" spellcheck="false">
+        <div class="hint" id="fUrlHint" hidden></div>
       </label>
       <div class="actions">
         <button class="btn primary" id="add">Add link</button>
@@ -286,6 +289,7 @@ input:focus-visible,textarea:focus-visible,select:focus-visible{outline:none}
 
     <section class="card" id="listCard">
       <h2>Your links <span id="count" class="count"></span></h2>
+      <p class="msg err" id="expNote" hidden></p>
       <div class="actions" style="margin:0 0 10px"><button class="btn small" id="checkInfo" type="button" hidden>Check file info</button></div>
       <input class="filter" id="filter" type="search" placeholder="Filter your links" autocomplete="off" hidden>
       <div id="list"></div>
@@ -294,13 +298,14 @@ input:focus-visible,textarea:focus-visible,select:focus-visible{outline:none}
     <section class="card">
       <h2>Install</h2>
       <p class="desc">Paste this manifest URL in Stremio or Nuvio. Changes show up right away — no reinstall needed.</p>
-      <div class="static urlbox" id="manifestUrl"></div>
+      <div class="static urlbox" id="manifestUrl">Loading&hellip;</div>
       <div class="actions">
         <a class="btn primary" id="open">Install in Stremio</a>
         <a class="btn primary" id="openNuvio">Install in Nuvio</a>
         <button class="btn" id="copy">Copy URL</button>
+        <button class="btn ink" id="rotate" type="button">New URL</button>
       </div>
-      <p class="note">Anyone with your URL can see your links, but not change them.</p>
+      <p class="note">Keep this URL private: it contains a secret key, and anyone who has it can see your links (but not change them). <b>New URL</b> makes a fresh key and the old URL stops working. Installed an older URL before? Remove that addon and install this one.</p>
     </section>
   </div>
 </main>
@@ -353,7 +358,7 @@ function thumbNode(poster, alt){
 }
 function hostOf(u){ try{ return new URL(u).host; }catch{ return ''; } }
 function pathName(){
-  const m = location.pathname.match(/^\/@([A-Za-z0-9_]{3,20})(?:\/configure)?\/?$/);
+  const m = location.pathname.match(/^\/@([A-Za-z0-9_]{3,20})(?:\/[a-f0-9]{32})?(?:\/configure)?\/?$/);
   return m ? m[1].toLowerCase() : null;
 }
 
@@ -427,14 +432,26 @@ function showAuth(name, mode, msg, cls){
   if(msg) setMsg('aMsg', msg, cls || '');
   if(name) $('aPw').focus(); else $('aName').focus();
 }
+let acctKey = null;   // secret part of the install URL
+function manifestPath(){ return '/@' + acct + '/' + acctKey + '/manifest.json'; }
+function setInstallUrls(){
+  if(!acct || !acctKey) return;
+  $('manifestUrl').textContent = location.origin + manifestPath();
+  $('open').href = 'stremio://' + location.host + manifestPath();
+  $('openNuvio').href = 'nuvio://' + location.host + manifestPath();
+}
+async function loadKey(){
+  $('manifestUrl').textContent = 'Loading\u2026';
+  try{ acctKey = (await call('key')).key; setInstallUrls(); }
+  catch(e){ if(e.status === 401) handleErr(e); else $('manifestUrl').textContent = e.message; }
+}
 function showApp(){
   show('app');
   $('whoami').textContent = '@' + acct;
+  acctKey = null;
+  $('open').removeAttribute('href'); $('openNuvio').removeAttribute('href');
   render(); renderSelected(); updateEpUI();
-  const path = '/@' + acct + '/manifest.json';
-  $('manifestUrl').textContent = location.origin + path;
-  $('open').href = 'stremio://' + location.host + path;
-  $('openNuvio').href = 'nuvio://' + location.host + path;
+  loadKey();
 }
 const LAST_KEY = 'cl_last_user';
 function rememberUser(n){ try{ localStorage.setItem(LAST_KEY, n); }catch(_){} }
@@ -719,6 +736,43 @@ $('checkInfo').onclick = async () => {
   if(acct) showToast('File info saved for ' + ok + ' of ' + todo.length + ' links', ok === 0);
 };
 
+/* ---------- link expiry (read from the link's own token, nothing is sent anywhere) ---------- */
+function linkExpiry(url){
+  try{
+    const u = new URL(url);
+    const tok = u.searchParams.get('token');
+    if(tok && tok.split('.').length === 3){
+      const p = JSON.parse(atob(tok.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+      if(Number(p.exp) > 1e9) return Number(p.exp) * 1000;
+    }
+    for(const k of ['expires', 'exp', 'Expires']){
+      const v = Number(u.searchParams.get(k));
+      if(v > 1e9 && v < 4e9) return v * 1000;
+    }
+  }catch(_){}
+  return null;
+}
+function expiryTag(exp){
+  const ms = exp - Date.now();
+  if(ms <= 0) return { text: 'Link expired', cls: 'bad' };
+  const m = Math.ceil(ms / 60000);
+  if(m < 60) return { text: 'Expires in ' + m + ' min', cls: m <= 15 ? 'warn' : '' };
+  const h = Math.round(ms / 3600000);
+  if(h < 48) return { text: 'Expires in ' + h + ' h', cls: '' };
+  return { text: 'Expires in ' + Math.round(h / 24) + ' days', cls: '' };
+}
+$('fUrl').addEventListener('input', () => {
+  const exp = linkExpiry($('fUrl').value.trim());
+  const hint = $('fUrlHint');
+  if(!exp){ hint.hidden = true; return; }
+  const t = expiryTag(exp);
+  hint.hidden = false;
+  hint.textContent = t.cls === 'bad' ? 'This link has already expired. Copy a fresh one.' : t.text + '. After that, edit this link and paste a fresh one.';
+});
+setInterval(() => {
+  if(!$('app').hidden && !$('delOverlay').classList.contains('open') && links.some(l => linkExpiry(l.url))) render();
+}, 60000);
+
 /* ---------- links list ---------- */
 const PAGE = 20;
 let shown = PAGE;
@@ -726,6 +780,9 @@ function render(){
   $('count').textContent = links.length ? String(links.length) : '';
   const q = $('filter').value.trim().toLowerCase();
   $('filter').hidden = links.length < 6;
+  const nExpired = links.filter(l => { const e = linkExpiry(l.url); return e && e <= Date.now(); }).length;
+  $('expNote').hidden = !nExpired;
+  $('expNote').textContent = nExpired + (nExpired === 1 ? ' link has' : ' links have') + ' expired. Tap Edit and paste a fresh link.';
   const missing = links.filter(l => l.imdb && !l.size).length;
   $('checkInfo').hidden = !missing;
   if(!probing) $('checkInfo').textContent = 'Check file info (' + missing + ')';
@@ -764,6 +821,12 @@ function render(){
       pill.textContent = l.size ? 'No hash' : 'No file info';
       pill.title = l.perr || 'Subtitles may not match until the file info is read';
       tags.appendChild(pill);
+    }
+    const exp = linkExpiry(l.url);
+    if(exp){
+      const t = expiryTag(exp);
+      const pill = document.createElement('span'); pill.className = 'count' + (t.cls ? ' ' + t.cls : ''); pill.textContent = t.text;
+      tags.insertBefore(pill, tags.firstChild);
     }
     if(tags.children.length) li.appendChild(tags);
     if(l.desc){
@@ -904,9 +967,18 @@ document.addEventListener('keydown', e => {
 
 /* ---------- install ---------- */
 $('copy').onclick = async () => {
-  const u = location.origin + '/@' + acct + '/manifest.json';
-  try{ await navigator.clipboard.writeText(u); showToast('Link copied'); }
+  if(!acctKey) return;
+  const u = location.origin + manifestPath();
+  try{ await navigator.clipboard.writeText(u); showToast('Install URL copied'); }
   catch{ prompt('Copy this URL', u); }
+};
+$('rotate').onclick = async () => {
+  if(!confirm('Make a new install URL?\n\nThe old URL stops working right away. Remove the old addon in Stremio/Nuvio and install the new one.')) return;
+  try{
+    acctKey = (await call('rotate')).key;
+    setInstallUrls();
+    showToast('New install URL ready. Reinstall the addon.');
+  }catch(e){ handleErr(e); }
 };
 
 $('logout').onclick = async () => {
