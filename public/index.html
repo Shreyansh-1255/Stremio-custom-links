@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="referrer" content="no-referrer">
 <title>Custom Links for Stremio &amp; Nuvio</title>
 <meta name="theme-color" content="#100e0c">
@@ -15,7 +15,7 @@
   --radius-s:6px; --radius-m:10px;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html{touch-action:pan-x pan-y;margin:0;padding:0}
+html{margin:0;padding:0;-webkit-text-size-adjust:100%}
 body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;line-height:1.5;min-height:100vh;margin:0;padding:0}
 button{font-family:inherit;cursor:pointer}
 button,.switch,.pills button,.rowbtns button,.s-clear,.chip>button,.list-row,.rowbtns,.actions .btn{
@@ -23,7 +23,7 @@ button,.switch,.pills button,.rowbtns button,.s-clear,.chip>button,.list-row,.ro
 a,img{-webkit-user-drag:none}
 a,button,.list-row,.pills button,.rowbtns button,.s-clear,.chip>button,.switch{touch-action:manipulation}
 input,textarea{-webkit-user-select:text;user-select:text}
-textarea{resize:none}
+textarea{resize:none;min-height:84px}
 input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 input[type=number]{-moz-appearance:textfield;appearance:textfield}
 svg{display:block}
@@ -102,12 +102,10 @@ select option{background:var(--surface-2);color:var(--text)}
 .chip>button svg{width:13px;height:13px;stroke:var(--muted)}
 
 /* ---------- links list: poster + name + description only ---------- */
-.link-row{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
+.link-row{border-bottom:1px solid var(--line)}
 .link-row:last-child{border-bottom:0}
-.link-row .li{flex:1;min-width:0}
 .link-row .li b{font-family:'Fraunces',serif;font-weight:600;font-size:15px;line-height:1.3;display:block}
 .link-row .li small{display:block;color:var(--muted);font-size:11.5px;margin-top:4px;line-height:1.45}
-.rowbtns{display:flex;gap:6px;flex-shrink:0;align-self:center}
 .rowbtns button{height:32px;padding:0 12px;border-radius:8px;border:1px solid var(--line);background:var(--surface-2);color:var(--text);font-size:12px;font-weight:600}
 .rowbtns button:hover{border-color:var(--muted)}
 .rowbtns .del{color:var(--danger-ink)}
@@ -128,33 +126,107 @@ select option{background:var(--surface-2);color:var(--text)}
 #clToast.show{opacity:1;transform:none;pointer-events:auto}
 #clToast span{flex:1}
 #clToast button{background:none;border:0;color:var(--muted);font-size:20px;line-height:1;padding:0 2px;cursor:pointer}
+
+/* ---------- v5.4 additions ---------- */
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+input:focus-visible,textarea:focus-visible,select:focus-visible{outline:none}
+.btn[disabled]{opacity:.55;cursor:default;filter:none}
+.btn.block{width:100%;margin-top:16px;padding:12px 14px;font-size:14px}
+.boot{display:flex;justify-content:center;padding:96px 0}
+.spin{width:26px;height:26px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--gold);animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.spin{animation-duration:2.4s}*{transition:none!important}}
+
+.brand{font-family:'Fraunces',serif;font-weight:700;font-size:22px;margin:4px 0 2px}
+.tagline{color:var(--muted);font-size:12.5px;margin:0}
+
+/* login / register */
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;margin-bottom:16px}
+.tabs button{height:36px;border:0;border-radius:7px;background:transparent;color:var(--muted);font-size:13px;font-weight:600}
+.tabs button[aria-selected="true"]{background:var(--text);color:var(--bg)}
+.field{margin-top:12px}
+.field>label{margin:0 0 5px}
+.at-wrap,.pw-wrap{display:flex;align-items:center;background:var(--surface-2);border:1px solid var(--line);border-radius:8px}
+.at-wrap:focus-within,.pw-wrap:focus-within{border-color:var(--gold)}
+.at-wrap .at{padding:0 0 0 12px;font-size:16px;font-weight:700;color:var(--gold);font-family:'Fraunces',serif}
+.at-wrap input,.pw-wrap input{border:0;background:transparent;flex:1;min-width:0}
+.at-wrap input{padding-left:3px}
+.pw-wrap button{flex:none;height:34px;margin-right:4px;padding:0 10px;border-radius:6px;border:0;background:transparent;color:var(--muted);font-size:12px;font-weight:600}
+.pw-wrap button:hover{color:var(--text)}
+.hint{font-size:11.5px;color:var(--muted);line-height:1.5;margin:6px 0 0}
+.hint b{color:var(--text);font-weight:600;word-break:break-all}
+
+/* top bar */
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:2px}
+.topbar .logged{margin:0;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.btn.small{padding:6px 12px;font-size:12px;border-radius:8px}
+
+/* links list (overrides) */
+.filter{margin-bottom:6px}
+.link-row{display:grid;grid-template-columns:44px minmax(0,1fr);gap:8px 12px;align-items:start;padding:14px 0}
+.link-row .li{min-width:0}
+.link-row .li b,.link-row .li small{overflow-wrap:anywhere;word-break:break-word}
+.link-row .li b{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.link-row .li small.d{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.link-row .li small.host{font-size:11px;opacity:.7;margin-top:3px}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:5px}
+.tags .count{margin:0;padding:1px 8px}
+.rowbtns{grid-column:2;display:grid;grid-template-columns:repeat(3,1fr);gap:6px;align-self:auto}
+.rowbtns button{height:34px;padding:0 6px}
+.more{display:block;width:100%;margin-top:10px}
+@media (max-width:600px){input,textarea,select{font-size:16px}.search-row input{font-size:16px}}
+#clToast.err{border-color:var(--danger-ink)}
 @media (max-width:400px){ main{padding:20px 12px 56px} .card{padding:14px} }
 </style>
 </head>
 <body>
 <main>
+  <div class="boot" id="boot"><div class="spin" role="status" aria-label="Loading"></div></div>
+
   <!-- Log in / Register -->
-  <div id="auth">
+  <div id="auth" hidden>
+    <h1 class="brand">Custom Links</h1>
+    <p class="tagline">Your own video links on Stremio &amp; Nuvio titles.</p>
     <section class="card">
-      <h2>Log in or create your page</h2>
-      <p class="desc">New here? Register creates the account with this username and password. A lost password can't be reset.</p>
-      <label>Username
-        <input id="aName" placeholder="yourname" maxlength="20" autocapitalize="none" autocomplete="off" spellcheck="false">
-      </label>
-      <label>Password
-        <input id="aPw" type="password" autocomplete="current-password">
-      </label>
-      <div class="actions">
-        <button class="btn primary" id="loginBtn">Log in</button>
-        <button class="btn" id="regBtn">Register</button>
+      <div class="tabs" role="tablist">
+        <button type="button" role="tab" id="tabLogin" aria-selected="true">Log in</button>
+        <button type="button" role="tab" id="tabReg" aria-selected="false">Register</button>
       </div>
-      <div class="msg" id="aMsg"></div>
+      <h2 id="aTitle">Log in</h2>
+      <p class="desc" id="aDesc">Enter your username and password to open your page.</p>
+      <form id="authForm" novalidate>
+        <div class="field">
+          <label for="aName">Username</label>
+          <div class="at-wrap">
+            <span class="at" aria-hidden="true">@</span>
+            <input id="aName" name="username" placeholder="username" maxlength="20" inputmode="text" autocapitalize="none" autocorrect="off" autocomplete="username" spellcheck="false">
+          </div>
+          <p class="hint" id="aHint">Your page: <b id="aPrev"></b></p>
+        </div>
+        <div class="field">
+          <label for="aPw">Password</label>
+          <div class="pw-wrap">
+            <input id="aPw" name="password" type="password" autocomplete="current-password" placeholder="Password">
+            <button type="button" id="pwToggle" aria-label="Show password">Show</button>
+          </div>
+        </div>
+        <div class="field" id="confirmBox" hidden>
+          <label for="aPw2">Confirm password</label>
+          <div class="pw-wrap"><input id="aPw2" name="password2" type="password" autocomplete="new-password" placeholder="Type it again"></div>
+          <p class="hint">At least 6 characters. A lost password can't be reset.</p>
+        </div>
+        <button class="btn primary block" id="submitBtn" type="submit">Log in</button>
+      </form>
+      <div class="msg" id="aMsg" role="alert"></div>
     </section>
   </div>
 
   <!-- Manager -->
   <div id="app" hidden>
-    <p class="logged">Logged in as <b id="whoami"></b></p>
+    <div class="topbar">
+      <p class="logged">Logged in as <b id="whoami"></b></p>
+      <button class="btn small ink" id="logout" type="button">Logout</button>
+    </div>
 
     <section class="card">
       <h2>Search a movie or series</h2>
@@ -203,17 +275,19 @@ select option{background:var(--surface-2);color:var(--text)}
         <textarea id="fDesc" maxlength="300" placeholder="e.g. The.Shawshank.Redemption.1994.720p.BluRay.Hindi.English.DD5.1.x264.ESubs.mkv"></textarea>
       </label>
       <label>Video link
-        <input id="fUrl" type="url" placeholder="https://example.com/video.mkv">
+        <input id="fUrl" type="url" placeholder="https://example.com/video.mkv" autocapitalize="none" autocorrect="off" spellcheck="false">
       </label>
       <div class="actions">
         <button class="btn primary" id="add">Add link</button>
         <button class="btn" id="cancel" hidden>Cancel edit</button>
       </div>
-      <p class="note" style="margin-bottom:0">Series links appear on every episode — or only on the one you pick. Titles without a link show a &ldquo;no link added in this title&rdquo; card.</p>
+      <div class="msg" id="fMsg" role="alert"></div>
+      <p class="note" style="margin-bottom:0">Series links appear on every episode — or only on the one you pick. Titles without a link show a &ldquo;No links found&rdquo; card &mdash; tapping it opens this page.</p>
     </section>
 
-    <section class="card">
+    <section class="card" id="listCard">
       <h2>Your links <span id="count" class="count"></span></h2>
+      <input class="filter" id="filter" type="search" placeholder="Filter your links" autocomplete="off" hidden>
       <div id="list"></div>
     </section>
 
@@ -224,9 +298,8 @@ select option{background:var(--surface-2);color:var(--text)}
       <div class="actions">
         <a class="btn primary" id="open">Install in Stremio</a>
         <button class="btn" id="copy">Copy URL</button>
-        <button class="btn ink" id="logout">Logout</button>
       </div>
-      <p class="note">Logout asks for the password again. Anyone with your URL can see your links, but not change them.</p>
+      <p class="note">Anyone with your URL can see your links, but not change them.</p>
     </section>
   </div>
 </main>
@@ -245,7 +318,7 @@ select option{background:var(--surface-2);color:var(--text)}
 </div>
 
 <!-- Toast (OpenStream playToast style) -->
-<div id="clToast" role="status"><span id="toastText"></span><button id="toastClose" aria-label="Dismiss">&times;</button></div>
+<div id="clToast" role="status" aria-live="polite"><span id="toastText"></span><button id="toastClose" aria-label="Dismiss">&times;</button></div>
 
 <script>
 const $ = id => document.getElementById(id);
@@ -265,7 +338,7 @@ const epMetaCache = new Map(); // imdb -> seasons array or null
 
 /* ---------- helpers ---------- */
 function setMsg(id, t, cls){ const e = $(id); e.textContent = t; e.className = 'msg' + (cls ? ' ' + cls : ''); }
-function show(which){ ['auth', 'app'].forEach(k => { $(k).hidden = k !== which; }); }
+function show(which){ ['boot', 'auth', 'app'].forEach(k => { $(k).hidden = k !== which; }); }
 const FILM_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3h18v18H3z"/><path d="M7 3v18M17 3v18M3 8h4M3 16h4M17 8h4M17 16h4"/></svg>';
 function thumbNode(poster, alt){
   const t = document.createElement('div'); t.className = 'list-thumb';
@@ -277,9 +350,16 @@ function thumbNode(poster, alt){
   }else t.innerHTML = FILM_ICON;
   return t;
 }
+function hostOf(u){ try{ return new URL(u).host; }catch{ return ''; } }
+function pathName(){
+  const m = location.pathname.match(/^\/@([A-Za-z0-9_]{3,20})(?:\/configure)?\/?$/);
+  return m ? m[1].toLowerCase() : null;
+}
 
 async function post(path, body){
-  const r = await fetch(path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  let r;
+  try{ r = await fetch(path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }); }
+  catch(_){ const e = new Error('No connection. Check your internet and try again.'); e.status = 0; throw e; }
   const j = await r.json().catch(() => ({}));
   if(!r.ok){ const e = new Error(j.error || 'Request failed'); e.status = r.status; throw e; }
   return j;
@@ -290,19 +370,61 @@ const call = (action, extra) => post('/api/links', { name: acct, action, ...(ext
 
 /* ---------- toast (OpenStream style) ---------- */
 let toastTimer = null;
-function showToast(msg){
+function showToast(msg, isErr){
   $('toastText').textContent = msg;
+  $('clToast').classList.toggle('err', !!isErr);
   $('clToast').classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => $('clToast').classList.remove('show'), 4000);
+  toastTimer = setTimeout(() => $('clToast').classList.remove('show'), isErr ? 6000 : 3500);
 }
 $('toastClose').onclick = () => { $('clToast').classList.remove('show'); clearTimeout(toastTimer); };
 
-/* ---------- log in / register (one form) ---------- */
-function showAuth(){
+/* ---------- log in / register (tabs, one form) ---------- */
+let authMode = 'login';
+let authBusy = false;
+
+function setMode(mode, keepMsg){
+  authMode = mode;
+  const reg = mode === 'register';
+  $('tabLogin').setAttribute('aria-selected', String(!reg));
+  $('tabReg').setAttribute('aria-selected', String(reg));
+  $('aTitle').textContent = reg ? 'Create your page' : 'Log in';
+  $('aDesc').textContent = reg
+    ? 'Pick a username and a password. Your page and install link are ready right away.'
+    : 'Enter your username and password to open your page.';
+  $('confirmBox').hidden = !reg;
+  $('aPw').autocomplete = reg ? 'new-password' : 'current-password';
+  $('submitBtn').textContent = reg ? 'Create account' : 'Log in';
+  $('aPw2').value = '';
+  if(!keepMsg) setMsg('aMsg', '');
+}
+$('tabLogin').onclick = () => setMode('login');
+$('tabReg').onclick = () => setMode('register');
+
+function updatePreview(){
+  const n = $('aName').value;
+  $('aPrev').textContent = location.host + '/@' + (n || 'username');
+}
+$('aName').addEventListener('input', () => {
+  const clean = $('aName').value.replace(/^@+/, '').toLowerCase().replace(/[^a-z0-9_]/g, '');
+  if(clean !== $('aName').value) $('aName').value = clean;
+  updatePreview();
+});
+$('pwToggle').onclick = () => {
+  const showing = $('aPw').type === 'text';
+  $('aPw').type = showing ? 'password' : 'text';
+  $('aPw2').type = showing ? 'password' : 'text';
+  $('pwToggle').textContent = showing ? 'Show' : 'Hide';
+  $('pwToggle').setAttribute('aria-label', showing ? 'Show password' : 'Hide password');
+};
+
+function showAuth(name, mode, msg, cls){
   show('auth');
-  const mn = location.pathname.match(/^\/@([A-Za-z0-9_]{3,20})(?:\/configure)?\/?$/);
-  if(mn) $('aName').value = mn[1].toLowerCase();
+  if(name) $('aName').value = name;
+  updatePreview();
+  setMode(mode || 'login', !!msg);
+  if(msg) setMsg('aMsg', msg, cls || '');
+  if(name) $('aPw').focus(); else $('aName').focus();
 }
 function showApp(){
   show('app');
@@ -313,59 +435,70 @@ function showApp(){
   $('open').href = 'stremio://' + location.host + path;
 }
 function afterAuth(){
-  // same page -> straight in; came from "/" -> move to the /@name URL
-  const mn = location.pathname.match(/^\/@([A-Za-z0-9_]{3,20})(?:\/configure)?\/?$/);
-  if(mn && mn[1].toLowerCase() === acct){ showApp(); return; }
-  location.href = '/@' + acct;
+  if(pathName() !== acct) history.replaceState(null, '', '/@' + acct);
+  showApp();
+}
+
+function checkName(n){
+  if(!n) return 'Enter a username.';
+  if(!/^[a-z0-9_]{3,20}$/.test(n)) return 'Username must be 3-20 letters, numbers or underscores.';
+  return '';
+}
+function setBusy(b){
+  authBusy = b;
+  $('submitBtn').disabled = b;
+  $('submitBtn').textContent = b ? 'Please wait\u2026' : (authMode === 'register' ? 'Create account' : 'Log in');
 }
 
 async function doLogin(){
-  const n = $('aName').value.trim().replace(/^@/, '').toLowerCase();
-  const pw = $('aPw').value;
-  if(!NAME_RE.test(n)) return setMsg('aMsg', 'Username: 3-20 letters, numbers or underscores.', 'err');
+  const n = $('aName').value, pw = $('aPw').value;
+  const bad = checkName(n); if(bad) return setMsg('aMsg', bad, 'err');
   if(!pw) return setMsg('aMsg', 'Enter your password.', 'err');
+  setBusy(true); setMsg('aMsg', '');
   try{
     links = await post('/api/links', { name: n, action: 'list', password: pw }); // server sets the cookie
     acct = n;
     $('aPw').value = '';
     afterAuth();
   }catch(e){
-    if(e.status === 404) setMsg('aMsg', 'No account with this name — tap Register to create it.', 'err');
+    if(e.status === 404){ setMode('register', true); setMsg('aMsg', 'No account @' + n + ' yet. Choose a password to create it.', 'err'); }
     else if(e.status === 401) setMsg('aMsg', 'Wrong password.', 'err');
     else setMsg('aMsg', e.message, 'err');
-  }
+  }finally{ setBusy(false); }
 }
 
 async function doRegister(){
-  const n = $('aName').value.trim().replace(/^@/, '').toLowerCase();
-  const pw = $('aPw').value;
-  if(!NAME_RE.test(n)) return setMsg('aMsg', 'Username: 3-20 letters, numbers or underscores.', 'err');
+  const n = $('aName').value, pw = $('aPw').value, pw2 = $('aPw2').value;
+  const bad = checkName(n); if(bad) return setMsg('aMsg', bad, 'err');
   if(pw.length < 6) return setMsg('aMsg', 'Password must be at least 6 characters.', 'err');
+  if(pw !== pw2) return setMsg('aMsg', 'The two passwords do not match.', 'err');
+  setBusy(true); setMsg('aMsg', '');
   try{
     await post('/api/user', { name: n, password: pw });
     links = await post('/api/links', { name: n, action: 'list', password: pw }); // server sets the cookie
     acct = n;
-    $('aPw').value = '';
+    $('aPw').value = ''; $('aPw2').value = '';
     afterAuth();
   }catch(e){
-    if(e.status === 409) setMsg('aMsg', 'That username is already taken — log in instead.', 'err');
+    if(e.status === 409){ setMode('login', true); setMsg('aMsg', '@' + n + ' is already taken. Log in if it is yours, or pick another username.', 'err'); }
     else setMsg('aMsg', e.message, 'err');
-  }
+  }finally{ setBusy(false); }
 }
 
-$('loginBtn').onclick = doLogin;
-$('regBtn').onclick = doRegister;
-$('aPw').addEventListener('keydown', e => { if(e.key === 'Enter') doLogin(); });
-$('aName').addEventListener('keydown', e => { if(e.key === 'Enter') $('aPw').focus(); });
+$('authForm').addEventListener('submit', e => {
+  e.preventDefault();
+  if(authBusy) return;
+  (authMode === 'register' ? doRegister : doLogin)();
+});
 
 /* ---------- search (Cinemeta via /api/search) ---------- */
 async function doSearch(){
   const q = $('q').value.trim();
   const seq = ++searchSeq;
-  if(q.length < 3){
+  if(!q){
     $('results').innerHTML = '';
     $('qClear').classList.remove('show');
-    setMsg('msg', q ? 'Type at least 3 characters.' : '');
+    setMsg('msg', '');
     return;
   }
   $('qClear').classList.add('show');
@@ -395,13 +528,13 @@ function renderResults(list){
     const info = document.createElement('div'); info.className = 'list-info';
     const title = document.createElement('div'); title.className = 'list-title'; title.textContent = r.name;
     const meta = document.createElement('div'); meta.className = 'list-meta';
-    const y = document.createElement('span'); y.textContent = r.year || 'year?';
+    const y = document.createElement('span'); y.textContent = r.year || '\u2014';
     const dot = document.createElement('span'); dot.className = 'dot'; dot.textContent = '\u00b7';
     const ty = document.createElement('span'); ty.textContent = r.type === 'series' ? 'Series' : 'Movie';
     meta.append(y, dot, ty);
     info.append(title, meta);
     btn.appendChild(info);
-    btn.onclick = () => { selected = r; renderSelected(); updateEpUI(); if(r.type === 'series') ensureEpMeta(r.imdb); $('results').innerHTML = ''; $('q').value = ''; $('qClear').classList.remove('show'); setMsg('msg', ''); $('fDesc').focus(); };
+    btn.onclick = () => { selected = r; renderSelected(); updateEpUI(); if(r.type === 'series') ensureEpMeta(r.imdb); $('results').innerHTML = ''; $('q').value = ''; $('qClear').classList.remove('show'); setMsg('msg', ''); setMsg('fMsg', ''); $('fDesc').focus(); };
     box.appendChild(btn);
   });
 }
@@ -418,13 +551,13 @@ function renderSelected(){
     t.appendChild(img);
   }else t.innerHTML = FILM_ICON;
   $('chipName').textContent = selected.name;
-  $('chipMeta').textContent = (selected.year || '') + (selected.type === 'series' ? ' \u00b7 series' : ' \u00b7 movie');
+  $('chipMeta').textContent = [selected.year, selected.type === 'series' ? 'Series' : 'Movie'].filter(Boolean).join(' \u00b7 ');
 }
 $('chipClear').onclick = () => { selected = null; renderSelected(); updateEpUI(); };
 
 $('q').addEventListener('input', () => {
   clearTimeout(searchTimer);
-  searchTimer = setTimeout(doSearch, 400);
+  searchTimer = setTimeout(doSearch, 300);
 });
 $('q').addEventListener('keydown', e => {
   if(e.key === 'Enter'){ e.preventDefault(); clearTimeout(searchTimer); doSearch(); }
@@ -443,7 +576,7 @@ $('pills').addEventListener('click', e => {
   const b = e.target.closest('button'); if(!b) return;
   qType = b.dataset.t;
   [...$('pills').children].forEach(x => x.classList.toggle('on', x === b));
-  if($('q').value.trim().length >= 3) doSearch();
+  if($('q').value.trim()) doSearch();
 });
 
 /* ---------- episode picker (series only, seasons from Cinemeta) ---------- */
@@ -533,44 +666,75 @@ $('epSwitch').addEventListener('click', () => {
   updateEpUI();
 });
 
-/* ---------- add / edit form ---------- */
+/* ---------- links list ---------- */
+const PAGE = 20;
+let shown = PAGE;
 function render(){
   $('count').textContent = links.length ? String(links.length) : '';
+  const q = $('filter').value.trim().toLowerCase();
+  $('filter').hidden = links.length < 6;
   const list = $('list'); list.innerHTML = '';
   if(!links.length){
     const e = document.createElement('div'); e.className = 'empty';
     e.textContent = 'No links yet. Search a title above, then add your first one.';
     list.appendChild(e);
+    return;
   }
-  links.forEach(l => {
+  // newest first; filter by title / description
+  const all = links.slice().reverse().filter(l => !q || ((l.imdb ? l.name : l.title) + ' ' + (l.desc || '')).toLowerCase().includes(q));
+  if(!all.length){
+    const e = document.createElement('div'); e.className = 'empty'; e.textContent = 'No links match your filter.';
+    list.appendChild(e);
+    return;
+  }
+  all.slice(0, shown).forEach(l => {
+    const title = (l.imdb ? l.name : l.title) || 'Untitled';
     const row = document.createElement('div'); row.className = 'link-row';
-    row.appendChild(thumbNode(l.poster, l.name));
+    row.appendChild(thumbNode(l.poster, title));
     const li = document.createElement('div'); li.className = 'li';
-    const b = document.createElement('b');
-    b.textContent = l.imdb ? l.name : l.title;
-    if(l.se){
+    const b = document.createElement('b'); b.textContent = title; b.title = title;
+    li.appendChild(b);
+    const tags = document.createElement('div'); tags.className = 'tags';
+    if(l.imdb && l.type === 'series'){
       const pill = document.createElement('span'); pill.className = 'count';
-      pill.textContent = 'S' + l.se + ' E' + l.ep;
-      b.appendChild(pill);
+      pill.textContent = l.se ? 'S' + l.se + ' E' + l.ep : 'All episodes';
+      tags.appendChild(pill);
     }
     if(!l.imdb){
-      const pill = document.createElement('span'); pill.className = 'count'; pill.textContent = 'not attached';
-      b.appendChild(pill);
+      const pill = document.createElement('span'); pill.className = 'count'; pill.textContent = 'Not attached';
+      tags.appendChild(pill);
     }
-    const s = document.createElement('small');
-    s.textContent = l.desc || '';
-    li.append(b, s);
+    if(tags.children.length) li.appendChild(tags);
+    if(l.desc){
+      const d = document.createElement('small'); d.className = 'd'; d.textContent = l.desc; d.title = l.desc;
+      li.appendChild(d);
+    }
+    const h = hostOf(l.url);
+    if(h){ const hs = document.createElement('small'); hs.className = 'host'; hs.textContent = h; li.appendChild(hs); }
     const btns = document.createElement('div'); btns.className = 'rowbtns';
     const ed = document.createElement('button'); ed.type = 'button'; ed.textContent = 'Edit';
-    ed.onclick = () => { startEdit(l); $('formTitle').scrollIntoView({ behavior: 'smooth', block: 'center' }); };
+    ed.onclick = () => { startEdit(l); $('formTitle').scrollIntoView({ behavior: 'smooth', block: 'start' }); };
+    const cp = document.createElement('button'); cp.type = 'button'; cp.textContent = 'Copy link';
+    cp.onclick = async () => {
+      try{ await navigator.clipboard.writeText(l.url); showToast('Video link copied'); }
+      catch{ prompt('Copy this link', l.url); }
+    };
     const del = document.createElement('button'); del.type = 'button'; del.className = 'del'; del.textContent = 'Delete';
     del.onclick = () => askDelete(l);
-    btns.append(ed, del);
+    btns.append(ed, cp, del);
     row.append(li, btns);
     list.appendChild(row);
   });
+  if(all.length > shown){
+    const m = document.createElement('button'); m.type = 'button'; m.className = 'btn more';
+    m.textContent = 'Show more (' + (all.length - shown) + ')';
+    m.onclick = () => { shown += PAGE; render(); };
+    list.appendChild(m);
+  }
 }
+$('filter').addEventListener('input', () => { shown = PAGE; render(); });
 
+/* ---------- add / edit form ---------- */
 function startEdit(l){
   editingId = l.id;
   selected = l.imdb ? { imdb: l.imdb, type: l.type, name: l.name, year: '', poster: l.poster || '' } : null;
@@ -588,7 +752,7 @@ function startEdit(l){
   $('add').textContent = 'Save changes';
   $('cancel').hidden = false;
   renderSelected(); updateEpUI();
-  setMsg('msg', '');
+  setMsg('msg', ''); setMsg('fMsg', '');
   if(!selected) $('q').focus(); else $('fDesc').focus();
 }
 function stopEdit(){
@@ -605,32 +769,44 @@ function stopEdit(){
   renderSelected(); updateEpUI();
 }
 
-function handleAuth(e){
-  acct = null;
-  showAuth();
-  setMsg('aMsg', 'Session expired. Log in again.', 'err');
+// Only a missing/expired login sends the user back to the login form;
+// any other error (bad link, network, limit) stays on the page.
+function handleErr(e, msgId){
+  if(e.status === 401){
+    const n = acct; acct = null;
+    showAuth(n, 'login', 'Your session expired. Log in again.', 'err');
+  }else if(msgId) setMsg(msgId, e.message, 'err');
+  else showToast(e.message, true);
 }
 
+let saving = false;
 $('add').onclick = async () => {
+  if(saving) return;
   const desc = $('fDesc').value.trim(), url = $('fUrl').value.trim();
-  if(!selected) return setMsg('msg', 'Search the movie or series by name and select it first.', 'err');
-  if(!desc) return setMsg('msg', 'Enter the description.', 'err');
+  setMsg('fMsg', '');
+  if(!selected) return setMsg('fMsg', 'Search the movie or series by name and select it first.', 'err');
+  if(!desc) return setMsg('fMsg', 'Enter the description.', 'err');
+  if(!/^https?:\/\//i.test(url)) return setMsg('fMsg', 'The video link must start with http:// or https://', 'err');
   let se = null, ep = null;
   if(selected.type === 'series' && !epSwitchOn()){
     if(!$('epMetaBox').hidden){ se = Number($('epSelSeason').value); ep = Number($('epSelEpisode').value); }
     else { se = Number($('fSe').value); ep = Number($('fEp').value); }
     if(!Number.isInteger(se) || !Number.isInteger(ep) || se < 1 || ep < 1 || se > 999 || ep > 999){
-      return setMsg('msg', 'Pick the season and episode, or keep "All episodes" on.', 'err');
+      return setMsg('fMsg', 'Pick the season and episode, or keep "All episodes" on.', 'err');
     }
   }
+  const wasEdit = !!editingId;
   const payload = { id: editingId, imdb: selected.imdb, type: selected.type, metaName: selected.name, desc, url, poster: selected.poster || '', se, ep };
+  saving = true; $('add').disabled = true;
   try{
-    links = await call(editingId ? 'update' : 'add', payload);
-    showToast(editingId ? 'Changes saved' : 'Link added');
-    stopEdit(); render();
-  }catch(e){ handleAuth(e); }
+    links = await call(wasEdit ? 'update' : 'add', payload);
+    stopEdit(); shown = PAGE; $('filter').value = ''; render();
+    showToast(wasEdit ? 'Changes saved' : 'Link added');
+    $('listCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }catch(e){ handleErr(e, 'fMsg'); }
+  finally{ saving = false; $('add').disabled = false; }
 };
-$('cancel').onclick = () => { stopEdit(); setMsg('msg', ''); };
+$('cancel').onclick = () => { stopEdit(); setMsg('msg', ''); setMsg('fMsg', ''); };
 
 /* ---------- delete confirmation ---------- */
 let pendingDelete = null;
@@ -652,7 +828,7 @@ $('delConfirm').onclick = async () => {
     if(editingId === l.id) stopEdit();
     showToast('Link deleted');
     render();
-  }catch(e){ handleAuth(e); }
+  }catch(e){ handleErr(e); }
 };
 document.addEventListener('keydown', e => {
   if(e.key === 'Escape' && $('delOverlay').classList.contains('open')) closeDelete();
@@ -670,17 +846,31 @@ $('logout').onclick = async () => {
   location.reload(); // cookie cleared -> the login screen comes back
 };
 
-/* ---------- boot: valid cookie -> straight in, else the login form ---------- */
+/* ---------- boot ----------
+   /@name  -> valid cookie: straight into the manager, else login form (name filled in)
+   /       -> valid cookie: auto-login and move to /@name, else login form */
 (async () => {
-  const mn = location.pathname.match(/^\/@([A-Za-z0-9_]{3,20})(?:\/configure)?\/?$/);
-  if(mn){
-    acct = mn[1].toLowerCase();
-    try{
+  const pn = pathName();
+  try{
+    if(pn){
+      acct = pn;
       links = await call('list');
       return showApp();
-    }catch(e){ acct = null; }
+    }
+    const me = await fetch('/api/me').then(r => r.json()).catch(() => ({}));
+    if(me && me.name){
+      acct = me.name;
+      links = await call('list');
+      history.replaceState(null, '', '/@' + acct);
+      return showApp();
+    }
+  }catch(e){
+    acct = null;
+    if(e.status === 404) return showAuth(pn, 'register', 'No account @' + pn + ' yet. Choose a password to create it.', 'err');
+    if(e.status === 0 || e.status >= 500) return showAuth(pn, 'login', e.message, 'err');
   }
-  showAuth();
+  acct = null;
+  showAuth(pn, 'login');
 })();
 </script>
 </body>
