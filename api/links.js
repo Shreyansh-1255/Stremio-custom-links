@@ -2,7 +2,9 @@
 // cookie is missing; on success the server sets a 30-day HttpOnly session
 // cookie, so page reloads never ask the password again until Logout clears
 // it (or the cookie is gone).
-// action: list | add | update | delete | probe | logout
+// action: list | add | update | delete | probe | key | rotate | logout
+// key: returns {key}, the secret part of the install URL (created on first use)
+// rotate: makes a new key; the old install URL stops working
 // probe {id}: reads the file's size, OpenSubtitles hash and name from the video
 // URL with HTTP Range requests and saves them on the link (size / hash / fname),
 // so the addon can send videoSize, videoHash and filename to Stremio.
@@ -58,6 +60,14 @@ module.exports = async (req, res) => {
       await L.deleteSession(token);
       res.setHeader('Set-Cookie', L.clearSessionCookie());
       return L.send(res, 200, { ok: true });
+    }
+
+    if (action === 'key' || action === 'rotate') {
+      if (action === 'rotate' || !user.key) {
+        user.key = crypto.randomBytes(16).toString('hex'); // 32 hex characters
+        await L.saveUser(name, user);
+      }
+      return L.send(res, 200, { key: user.key });
     }
 
     if (action === 'list') return L.send(res, 200, links);
