@@ -16,6 +16,26 @@
   ],
   "rewrites": [
     {
+      "source": "/@:username/:key/manifest.json",
+      "destination": "/api/addon?u=:username&k=:key&r=manifest"
+    },
+    {
+      "source": "/@:username/:key/catalog/:type/:id.json",
+      "destination": "/api/addon?u=:username&k=:key&r=catalog"
+    },
+    {
+      "source": "/@:username/:key/meta/:type/:id.json",
+      "destination": "/api/addon?u=:username&k=:key&r=meta&type=:type&id=:id"
+    },
+    {
+      "source": "/@:username/:key/stream/:type/:id.json",
+      "destination": "/api/addon?u=:username&k=:key&r=stream&type=:type&id=:id"
+    },
+    {
+      "source": "/@:username/:key/configure",
+      "destination": "/index.html"
+    },
+    {
       "source": "/@:username/manifest.json",
       "destination": "/api/addon?u=:username&r=manifest"
     },
