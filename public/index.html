@@ -3,85 +3,168 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
 <title>Custom Links for Stremio &amp; Nuvio</title>
+<meta name="theme-color" content="#100e0c">
+<script>try{if(localStorage.getItem("cl_theme")==="light"){document.documentElement.setAttribute("data-theme","light");document.querySelector('meta[name="theme-color"]').setAttribute("content","#f3ecdc");}}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=DM+Sans:wght@400;500;600;700&display=swap">
 <style>
+:root{
+  --bg:#100e0c; --surface:#1b1712; --surface-2:#24201a; --line:#322b21;
+  --text:#f1e9d8; --muted:#8f8471; --gold:#cda24e; --danger:#8c3b34; --danger-ink:#e07a6a;
+  --radius-s:6px; --radius-m:10px;
+}
+:root[data-theme="light"]{
+  color-scheme:light;
+  --bg:#f3ecdc; --surface:#faf5e8; --surface-2:#ece3cd; --line:#ddd1b6;
+  --text:#2b2318; --muted:#6e624d; --gold:#8f6212; --danger:#8c3b34; --danger-ink:#8c3b34;
+}
+.theme-anim,.theme-anim *{transition:background-color .25s ease,color .25s ease,border-color .25s ease,fill .25s ease,stroke .25s ease!important}
+@media (prefers-reduced-motion:reduce){.theme-anim,.theme-anim *{transition:none!important}}
 *{box-sizing:border-box}
-body{margin:0;font-family:system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;background:#fafafa;color:#111;line-height:1.5;font-size:15px}
-main{max-width:640px;margin:0 auto;padding:24px 16px 60px}
-h1{font-size:26px;margin:0 0 4px}
-.sub{color:#666;margin:0 0 24px;font-size:14px}
-.card{background:#fff;border:1px solid #e4e4e8;border-radius:10px;padding:16px 18px;margin-bottom:16px}
-.card h2{font-size:16px;margin:0 0 12px;font-weight:600}
-label{display:block;font-size:13px;color:#555;margin:0 0 12px}
-input,select,textarea{display:block;width:100%;border:1px solid #ccc;border-radius:8px;padding:9px 11px;font:inherit;background:#fff;margin-top:4px;color:#111}
-textarea{resize:vertical;min-height:56px}
-button{font:inherit;cursor:pointer}
-.btn{border:1px solid #ccc;background:#fff;border-radius:8px;padding:8px 14px;font-size:14px;text-decoration:none;display:inline-block;color:#111}
-.btn:hover{background:#f2f2f2}
-.btn.primary{background:#2563eb;border-color:#2563eb;color:#fff}
-.btn.primary:hover{background:#1d4fd8}
-.btn.danger{color:#b3261e;border-color:#e5b5b2}
-.btn.danger:hover{background:#fbeeee}
-.actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.msg{min-height:18px;font-size:13px;margin:8px 0 0;color:#666}
-.msg.bad{color:#b3261e} .msg.ok{color:#12805c}
-.searchline{display:flex;gap:8px}
-.searchline input{flex:1;min-width:0;margin-top:0}
-.searchline select{width:auto;flex:0 0 auto;margin-top:0}
-.results{margin-top:10px;border:1px solid #e4e4e8;border-radius:8px;background:#fff;max-height:260px;overflow-y:auto}
-.results:empty{display:none}
-.result{display:flex;gap:10px;align-items:center;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid #eee;padding:8px 10px;font-size:14px;color:#111}
-.result:last-child{border-bottom:0}
-.result:hover{background:#f0f5ff}
-.result img{width:30px;height:44px;object-fit:cover;border-radius:3px;background:#eee;flex:0 0 auto}
-.result div{min-width:0;flex:1}
-.result b{display:block;font-weight:600;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.result small{display:block;color:#666}
-.selected{display:flex;gap:10px;align-items:center;border:1px solid #2563eb;background:#f0f5ff;border-radius:8px;padding:8px 10px;margin-top:10px}
-.selected img{width:30px;height:44px;object-fit:cover;border-radius:3px;background:#eee;flex:0 0 auto}
-.selected div{min-width:0;flex:1;font-size:14px}
-.selected b{display:block;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.selected small{display:block;color:#666}
-.selected button{border:0;background:none;color:#b3261e;padding:4px 6px;flex:0 0 auto}
-.row{display:flex;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid #eee}
-.row:last-child{border-bottom:0}
-.row>div{flex:1;min-width:0;font-size:14px}
-.row b{display:block;font-weight:600;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.row small{display:block;color:#666;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px}
-.row .linkbtn{border:0;background:none;color:#2563eb;padding:4px 6px;flex:0 0 auto;font-size:13px}
-.row .del{color:#b3261e}
-.badge{display:inline-block;font-size:11px;border:1px solid #ddd;border-radius:4px;padding:1px 6px;color:#666;margin-left:6px;vertical-align:middle}
-.empty{color:#666;font-size:14px}
-code{display:block;word-break:break-all;font-size:12px;background:#f6f6f8;border:1px solid #e4e4e8;border-radius:8px;padding:10px;margin-bottom:12px}
-.note{color:#666;font-size:12px;margin:8px 0 0}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;line-height:1.5;min-height:100vh}
+button{font-family:inherit;cursor:pointer}
+svg{display:block}
+a{color:inherit}
+main{max-width:480px;margin:0 auto;padding:28px 16px 64px}
 [hidden]{display:none!important}
+
+/* ---------- header ---------- */
+.head-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px}
+.head-row .mark{width:26px;height:26px;flex:none;margin-top:3px;color:var(--gold)}
+h1{font-family:'Fraunces',serif;font-size:22px;font-weight:700;margin:0 0 4px;line-height:1.2}
+.sub{color:var(--muted);font-size:12.5px;margin:0}
+
+/* ---------- set-box style cards ---------- */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-m);padding:18px;margin-top:14px}
+.card h2{font-size:16px;margin:0 0 4px;font-weight:700;font-family:'Fraunces',serif}
+.card .desc{font-size:12px;color:var(--muted);line-height:1.5;margin:0 0 12px}
+label{display:block;font-size:11px;color:var(--muted);margin:10px 0 5px}
+input,textarea{display:block;width:100%;font-size:13px;padding:10px 11px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;color:var(--text);outline:none;font-family:inherit}
+input:focus,textarea:focus{border-color:var(--gold)}
+textarea{resize:vertical;min-height:56px}
+.static{font-size:13px;padding:9px 11px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px}
+.urlbox{font-size:12.5px;word-break:break-all;margin-bottom:0}
+.actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.actions.tight{margin-top:0}
+.btn{padding:10px 14px;border-radius:8px;border:1px solid var(--line);background:var(--surface-2);color:var(--text);font-size:13px;font-weight:600;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--gold);border-color:var(--gold);color:#1a1409}
+.btn.primary:hover{border-color:var(--gold);filter:brightness(1.05)}
+.btn.danger{background:var(--danger);border-color:var(--danger);color:#fff}
+.btn.ink{color:var(--danger-ink)}
+.msg{font-size:12px;min-height:18px;margin-top:8px;color:var(--muted)}
+.msg.ok{color:#7fbf7f}
+.msg.err{color:var(--danger-ink)}
+.note{font-size:11px;color:var(--muted);line-height:1.5;margin:14px 0 0}
+.count{font-size:11px;color:var(--muted);border:1px solid var(--line);border-radius:99px;padding:2px 8px;margin-left:8px;vertical-align:middle;font-family:'DM Sans',sans-serif}
+
+/* ---------- toggle (OpenStream switch) ---------- */
+.toggle-row{display:flex;align-items:center;gap:12px;padding:10px 11px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;margin-top:14px}
+.toggle-row .tx{flex:1;min-width:0}
+.toggle-row b{display:block;font-size:13px;font-weight:600}
+.toggle-row small{display:block;font-size:11px;color:var(--muted);line-height:1.4;margin-top:2px}
+.switch{flex:none;width:42px;height:24px;border-radius:99px;background:var(--surface);border:1px solid var(--line);position:relative;padding:0;transition:background .2s,border-color .2s}
+.switch i{position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:var(--muted);transition:transform .2s,background .2s}
+.switch[aria-checked="true"]{background:var(--gold);border-color:var(--gold)}
+.switch[aria-checked="true"] i{transform:translateX(18px);background:#1a1409}
+
+/* ---------- search panel (OpenStream search overlay style) ---------- */
+.search-row{display:flex;align-items:center;gap:10px;background:var(--surface-2);border:1px solid var(--line);border-radius:30px;padding:4px 8px 4px 16px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.search-row svg.mag{width:16px;height:16px;stroke:var(--muted);flex-shrink:0}
+.search-row input{flex:1;min-width:0;background:transparent;border:0;padding:12px 0;font-size:15px}
+.search-row input:focus{border-color:transparent}
+.search-row input::placeholder{color:#6b6252}
+:root[data-theme="light"] .search-row input::placeholder{color:#a09377}
+.s-clear{width:34px;height:34px;border-radius:50%;background:var(--surface);border:1px solid var(--line);display:none;align-items:center;justify-content:center;flex-shrink:0;padding:0}
+.s-clear.show{display:flex}
+.s-clear svg{width:14px;height:14px;stroke:var(--text)}
+.pills{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.pills button{height:36px;padding:0 16px;border-radius:99px;border:1px solid var(--line);background:transparent;color:var(--muted);font-size:13px;font-weight:600}
+.pills button.on{background:var(--text);color:var(--bg);border-color:var(--text)}
+.results{margin-top:12px;background:var(--surface-2);border:1px solid var(--line);border-radius:16px;max-height:60vh;overflow-y:auto}
+.results:empty{display:none}
+.state-msg{color:var(--muted);font-size:12.5px;text-align:center;padding:28px 14px}
+.state-msg.error{color:var(--danger-ink)}
+.list-row{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);padding:10px 14px;color:var(--text)}
+.list-row:last-child{border-bottom:0}
+.list-row:hover{background:var(--surface)}
+.list-thumb{width:44px;height:64px;border-radius:4px;overflow:hidden;background:var(--surface);border:1px solid var(--line);flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.list-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.list-thumb svg{width:40%;max-width:26px;color:var(--muted)}
+.list-info{flex:1;min-width:0}
+.list-title{font-family:'Fraunces',serif;font-weight:600;font-size:15px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.list-meta{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:11.5px;margin-top:5px;flex-wrap:wrap}
+.list-meta .dot{opacity:.5}
+.chip{display:flex;align-items:center;gap:12px;margin-top:12px;padding:8px 10px;background:var(--surface-2);border:1px solid var(--gold);border-radius:8px}
+.chip .list-thumb{width:36px;height:52px}
+.chip .list-title{font-size:14px}
+.chip .list-meta{margin-top:3px}
+.chip>button{width:32px;height:32px;border-radius:50%;background:var(--surface);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0}
+.chip>button svg{width:13px;height:13px;stroke:var(--muted)}
+
+/* ---------- links list ---------- */
+.link-row{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
+.link-row:last-child{border-bottom:0}
+.link-row .li{flex:1;min-width:0}
+.link-row .li b{font-family:'Fraunces',serif;font-weight:600;font-size:15px;line-height:1.3;display:block}
+.link-row .li small{display:block;color:var(--muted);font-size:11.5px;margin-top:4px;word-break:break-all}
+.rowbtns{display:flex;gap:6px;flex-shrink:0}
+.rowbtns button{height:32px;padding:0 12px;border-radius:8px;border:1px solid var(--line);background:var(--surface-2);color:var(--text);font-size:12px;font-weight:600}
+.rowbtns button:hover{border-color:var(--muted)}
+.rowbtns .del{color:var(--danger-ink)}
+.empty{color:var(--muted);font-size:12.5px;text-align:center;padding:20px 0}
+
+/* ---------- confirm modal (OpenStream set-overlay style) ---------- */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;padding:16px;z-index:100}
+.overlay.open{display:flex}
+:root[data-theme="light"] .overlay{background:rgba(50,38,20,.45)}
+.modal{width:100%;max-width:360px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-m);padding:18px}
+.modal h3{font-size:16px;margin:0 0 4px;font-family:'Fraunces',serif}
+.modal p{font-size:12.5px;color:var(--muted);line-height:1.5;margin:0}
+.modal .target{font-size:13px;padding:9px 11px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;margin:10px 0 2px;min-width:0}
+.modal .target b{display:block;font-family:'Fraunces',serif;font-weight:600;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.modal .target small{display:block;color:var(--muted);font-size:11px;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media (max-width:400px){ main{padding:20px 12px 56px} .card{padding:14px} }
 </style>
 </head>
 <body>
 <main>
-  <h1>Custom Links</h1>
-  <p class="sub">Attach your own video links to movies and series — they play right on the original title card in Stremio and Nuvio.</p>
+  <div class="head-row">
+    <svg class="mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3h18v18H3z"/><path d="M7 3v18M17 3v18M3 8h4M3 16h4M17 8h4M17 16h4"/></svg>
+    <div>
+      <h1>Custom Links</h1>
+      <p class="sub">Attach your own video links to movies and series — they play right on the original title card in Stremio and Nuvio.</p>
+    </div>
+  </div>
+  <div class="toggle-row">
+    <div class="tx"><b>Light theme</b><small>OpenStream's cream look. Off = the dark theme.</small></div>
+    <button type="button" class="switch" id="themeSwitch" role="switch" aria-checked="false" aria-label="Light theme"><i></i></button>
+  </div>
 
   <!-- Home -->
   <div id="home">
     <section class="card">
       <h2>Open or create your page</h2>
+      <p class="desc">Pick a username — it becomes part of your personal addon URL.</p>
       <label>Username
-        <input id="hName" placeholder="yourname" maxlength="20" autocapitalize="none" autocomplete="off" pattern="[a-z0-9_]{3,20}">
+        <input id="hName" placeholder="yourname" maxlength="20" autocapitalize="none" autocomplete="off" spellcheck="false">
       </label>
       <div class="actions"><button class="btn primary" id="go">Continue</button></div>
       <div class="msg" id="hMsg"></div>
     </section>
     <section class="card">
       <h2>How it works</h2>
-      <p class="note" style="font-size:13px">1. Pick a username and set a password &nbsp;·&nbsp; 2. Search a movie or series by name and select it &nbsp;·&nbsp; 3. Paste your description and video link &nbsp;·&nbsp; 4. Install your addon URL in Stremio or Nuvio.</p>
+      <p class="desc" style="margin:0">1. Pick a username and set a password &nbsp;·&nbsp; 2. Search a movie or series by name and select it &nbsp;·&nbsp; 3. Paste your description and video link &nbsp;·&nbsp; 4. Install your addon URL in Stremio or Nuvio.</p>
     </section>
   </div>
 
   <!-- New user -->
   <section class="card" id="claim" hidden>
     <h2>Create your page</h2>
-    <p class="note" style="margin-bottom:12px">This username is free. Set a password for it — a lost password can't be reset.</p>
+    <p class="desc">This username is free. Set a password for it — a lost password can't be reset.</p>
     <label>Password <input id="cPw" type="password" autocomplete="new-password"></label>
     <label>Repeat password <input id="cPw2" type="password" autocomplete="new-password"></label>
     <div class="actions"><button class="btn primary" id="create">Create page</button></div>
@@ -91,7 +174,7 @@ code{display:block;word-break:break-all;font-size:12px;background:#f6f6f8;border
   <!-- Existing user -->
   <section class="card" id="login" hidden>
     <h2>Enter your password</h2>
-    <p class="note" style="margin-bottom:12px">You stay logged in on this device until you press Logout.</p>
+    <p class="desc">You stay logged in on this device until you press Logout.</p>
     <label>Password <input id="lPw" type="password" autocomplete="current-password"></label>
     <div class="actions"><button class="btn primary" id="unlock">Log in</button></div>
     <div class="msg" id="lMsg"></div>
@@ -100,26 +183,33 @@ code{display:block;word-break:break-all;font-size:12px;background:#f6f6f8;border
   <!-- Manager -->
   <div id="app" hidden>
     <section class="card">
-      <h2>1. Search a movie or series</h2>
-      <div class="searchline">
-        <input id="q" placeholder="Search by name, e.g. The Shawshank Redemption" maxlength="100" autocomplete="off">
-        <select id="qType">
-          <option value="all">All</option>
-          <option value="movie">Movies</option>
-          <option value="series">Series</option>
-        </select>
+      <h2>Search a movie or series</h2>
+      <p class="desc">Found on Cinemeta — the same titles Stremio and Nuvio show.</p>
+      <div class="search-row">
+        <svg class="mag" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg>
+        <input id="q" placeholder="Titles, e.g. The Shawshank Redemption" maxlength="100" autocomplete="off" enterkeyhint="search">
+        <button class="s-clear" id="qClear" aria-label="Clear search" type="button"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+      </div>
+      <div class="pills" id="pills">
+        <button type="button" data-t="all" class="on">All</button>
+        <button type="button" data-t="movie">Movies</button>
+        <button type="button" data-t="series">Series</button>
       </div>
       <div class="results" id="results"></div>
-      <div class="msg" id="qMsg"></div>
-      <div class="selected" id="chipBox" hidden>
-        <img id="chipPoster" alt="" hidden>
-        <div><b id="chipName"></b><small id="chipMeta"></small></div>
-        <button id="chipClear" title="Clear selection">&#10005;</button>
+      <div class="chip" id="chipBox" hidden>
+        <div class="list-thumb" id="chipThumb"></div>
+        <div class="list-info">
+          <div class="list-title" id="chipName"></div>
+          <div class="list-meta" id="chipMeta"></div>
+        </div>
+        <button id="chipClear" aria-label="Clear selection" type="button"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
       </div>
+      <div class="msg" id="msg"></div>
     </section>
 
     <section class="card">
-      <h2 id="formTitle">2. Add the link</h2>
+      <h2 id="formTitle">Add the link</h2>
+      <p class="desc" id="formDesc">It will appear as a play card on the title you selected above.</p>
       <label>Description shown under the title
         <textarea id="fDesc" maxlength="300" placeholder="e.g. The.Shawshank.Redemption.1994.720p.BluRay.Hindi.English.DD5.1.x264.ESubs.mkv"></textarea>
       </label>
@@ -130,27 +220,40 @@ code{display:block;word-break:break-all;font-size:12px;background:#f6f6f8;border
         <button class="btn primary" id="add">Add link</button>
         <button class="btn" id="cancel" hidden>Cancel edit</button>
       </div>
-      <div class="msg" id="msg"></div>
-      <p class="note">Series links appear on every episode. Titles without a link show a &ldquo;no link added in this title&rdquo; card.</p>
+      <p class="note" style="margin-bottom:0">Series links appear on every episode. Titles without a link show a &ldquo;no link added in this title&rdquo; card.</p>
     </section>
 
     <section class="card">
-      <h2>Your links <span id="count" class="badge"></span></h2>
+      <h2>Your links <span id="count" class="count"></span></h2>
       <div id="list"></div>
     </section>
 
     <section class="card">
       <h2>Install</h2>
-      <code id="manifestUrl"></code>
+      <p class="desc">Paste this manifest URL in Stremio or Nuvio. Changes show up right away — no reinstall needed.</p>
+      <div class="static urlbox" id="manifestUrl"></div>
       <div class="actions">
         <a class="btn primary" id="open">Install in Stremio</a>
         <button class="btn" id="copy">Copy URL</button>
-        <button class="btn danger" id="logout">Logout</button>
+        <button class="btn ink" id="logout">Logout</button>
       </div>
-      <p class="note">For Nuvio, paste the same URL as an addon. Changes show up right away — no reinstall needed. Logout asks for the password again.</p>
+      <p class="note">Logout asks for the password again. Anyone with your URL can see your links, but not change them.</p>
     </section>
   </div>
 </main>
+
+<!-- Delete confirmation -->
+<div class="overlay" id="delOverlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="delTitle">
+    <h3 id="delTitle">Delete this link?</h3>
+    <p>This removes it from your addon. This can't be undone.</p>
+    <div class="target"><b id="delName"></b><small id="delUrl"></small></div>
+    <div class="actions">
+      <button class="btn" id="delCancel">Cancel</button>
+      <button class="btn danger" id="delConfirm">Delete</button>
+    </div>
+  </div>
+</div>
 
 <script>
 const $ = id => document.getElementById(id);
@@ -161,10 +264,43 @@ let links = [];
 let editingId = null;
 let selected = null;        // { imdb, type, name, year, poster }
 let searchTimer = null;
+let searchSeq = 0;
+let qType = 'all';
 
-function setMsg(id, t, cls){ const e = $(id); e.textContent = t; e.className = 'msg ' + (cls || ''); }
-function show(which){
-  ['home', 'claim', 'login', 'app'].forEach(k => { if($(k)) $(k).hidden = k !== which; });
+/* ---------- theme (OpenStream style) ---------- */
+const themeSwitch = $('themeSwitch');
+function applyTheme(light, save){
+  document.documentElement.classList.add('theme-anim');
+  clearTimeout(applyTheme.t);
+  applyTheme.t = setTimeout(() => document.documentElement.classList.remove('theme-anim'), 350);
+  if(light){
+    document.documentElement.setAttribute('data-theme', 'light');
+    document.querySelector('meta[name="theme-color"]').setAttribute('content', '#f3ecdc');
+  }else{
+    document.documentElement.removeAttribute('data-theme');
+    document.querySelector('meta[name="theme-color"]').setAttribute('content', '#100e0c');
+  }
+  themeSwitch.setAttribute('aria-checked', String(light));
+  if(save){ try{ localStorage.setItem('cl_theme', light ? 'light' : 'dark'); }catch(e){} }
+}
+applyTheme(document.documentElement.getAttribute('data-theme') === 'light', false);
+themeSwitch.addEventListener('click', () => {
+  applyTheme(document.documentElement.getAttribute('data-theme') !== 'light', true);
+});
+
+/* ---------- helpers ---------- */
+function setMsg(id, t, cls){ const e = $(id); e.textContent = t; e.className = 'msg' + (cls ? ' ' + cls : ''); }
+function show(which){ ['home', 'claim', 'login', 'app'].forEach(k => { if($(k)) $(k).hidden = k !== which; }); }
+const FILM_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3h18v18H3z"/><path d="M7 3v18M17 3v18M3 8h4M3 16h4M17 8h4M17 16h4"/></svg>';
+function thumbNode(poster, alt){
+  const t = document.createElement('div'); t.className = 'list-thumb';
+  if(poster){
+    const img = document.createElement('img');
+    img.src = poster; img.loading = 'lazy'; img.alt = alt || '';
+    img.onerror = () => { img.remove(); t.innerHTML = FILM_ICON; };
+    t.appendChild(img);
+  }else t.innerHTML = FILM_ICON;
+  return t;
 }
 
 async function post(path, body){
@@ -180,10 +316,10 @@ const call = (action, extra) => post('/api/links', { name: user, action, ...(ext
 /* ---------- Home ---------- */
 function startHome(){
   show('home');
-  if(location.pathname.startsWith('/@')) setMsg('hMsg', 'That username is not valid. Use 3-20 letters, numbers or underscores.', 'bad');
+  if(location.pathname.startsWith('/@')) setMsg('hMsg', 'That username is not valid. Use 3-20 letters, numbers or underscores.', 'err');
   const go = () => {
     const n = $('hName').value.trim().replace(/^@/, '').toLowerCase();
-    if(!NAME_RE.test(n)) return setMsg('hMsg', 'Use 3-20 letters, numbers or underscores.', 'bad');
+    if(!NAME_RE.test(n)) return setMsg('hMsg', 'Use 3-20 letters, numbers or underscores.', 'err');
     location.href = '/@' + n;
   };
   $('go').onclick = go;
@@ -200,7 +336,7 @@ async function startUser(){
   }catch(e){
     if(e.status === 404) return show('claim');
     if(e.status === 401) return show('login');
-    show('login'); setMsg('lMsg', 'Could not reach the server. ' + e.message, 'bad');
+    show('login'); setMsg('lMsg', 'Could not reach the server. ' + e.message, 'err');
   }
 }
 
@@ -211,20 +347,20 @@ async function login(password){
 
 $('create').onclick = async () => {
   const p1 = $('cPw').value, p2 = $('cPw2').value;
-  if(p1.length < 6) return setMsg('cMsg', 'Password must be at least 6 characters.', 'bad');
-  if(p1 !== p2) return setMsg('cMsg', 'Passwords do not match.', 'bad');
+  if(p1.length < 6) return setMsg('cMsg', 'Password must be at least 6 characters.', 'err');
+  if(p1 !== p2) return setMsg('cMsg', 'Passwords do not match.', 'err');
   try{
     await post('/api/user', { name: user, password: p1 });
     await login(p1);
     $('cPw').value = $('cPw2').value = '';
-  }catch(e){ setMsg('cMsg', e.message, 'bad'); }
+  }catch(e){ setMsg('cMsg', e.message, 'err'); }
 };
 
 $('unlock').onclick = () => tryUnlock();
 $('lPw').addEventListener('keydown', e => { if(e.key === 'Enter') tryUnlock(); });
 async function tryUnlock(){
   try{ await login($('lPw').value); $('lPw').value = ''; }
-  catch(e){ setMsg('lMsg', e.message, 'bad'); }
+  catch(e){ setMsg('lMsg', e.message, 'err'); }
 }
 
 function showApp(){
@@ -235,44 +371,50 @@ function showApp(){
   $('open').href = 'stremio://' + location.host + path;
 }
 
-/* ---------- Search (Cinemeta via /api/search) ---------- */
-function posterImg(src, alt){
-  const img = document.createElement('img');
-  if(src){ img.src = src; img.loading = 'lazy'; img.referrerPolicy = 'no-referrer'; }
-  else img.hidden = true;
-  img.alt = alt || '';
-  img.onerror = () => { img.hidden = true; };
-  return img;
-}
-
+/* ---------- search (Cinemeta via /api/search) ---------- */
 async function doSearch(){
   const q = $('q').value.trim();
-  if(q.length < 3){ $('results').innerHTML = ''; setMsg('qMsg', q ? 'Type at least 3 characters.' : ''); return; }
-  setMsg('qMsg', 'Searching\u2026');
+  const seq = ++searchSeq;
+  if(q.length < 3){
+    $('results').innerHTML = '';
+    $('qClear').classList.remove('show');
+    setMsg('msg', q ? 'Type at least 3 characters.' : '');
+    return;
+  }
+  $('qClear').classList.add('show');
+  const box = $('results');
+  box.innerHTML = '<div class="state-msg">Searching\u2026</div>';
   try{
-    const r = await fetch('/api/search?q=' + encodeURIComponent(q) + '&type=' + $('qType').value);
+    const r = await fetch('/api/search?q=' + encodeURIComponent(q) + '&type=' + qType);
     const j = await r.json().catch(() => ({}));
+    if(seq !== searchSeq) return; // an older request finished late
     if(!r.ok) throw new Error(j.error || 'Search failed');
     renderResults(j.results || []);
   }catch(e){
-    $('results').innerHTML = '';
-    setMsg('qMsg', 'Search failed: ' + e.message, 'bad');
+    if(seq !== searchSeq) return;
+    box.innerHTML = '<div class="state-msg error">Search failed: ' + String(e.message).replace(/[<>&]/g, '') + '</div>';
   }
 }
 
 function renderResults(list){
   const box = $('results'); box.innerHTML = '';
-  if(!list.length){ setMsg('qMsg', 'No results \u2014 try another spelling.'); return; }
-  setMsg('qMsg', '');
+  if(!list.length){
+    box.innerHTML = '<div class="state-msg">No results \u2014 try another spelling.</div>';
+    return;
+  }
   list.forEach(r => {
-    const btn = document.createElement('button'); btn.className = 'result';
-    btn.append(posterImg(r.poster, r.name));
-    const d = document.createElement('div');
-    const b = document.createElement('b'); b.textContent = r.name;
-    const s = document.createElement('small'); s.textContent = (r.year || 'year?') + ' \u00b7 ' + (r.type === 'series' ? 'Series' : 'Movie');
-    d.append(b, s);
-    btn.append(d);
-    btn.onclick = () => { selected = r; renderSelected(); $('fDesc').focus(); setMsg('msg', ''); };
+    const btn = document.createElement('button'); btn.className = 'list-row'; btn.type = 'button';
+    btn.appendChild(thumbNode(r.poster, r.name));
+    const info = document.createElement('div'); info.className = 'list-info';
+    const title = document.createElement('div'); title.className = 'list-title'; title.textContent = r.name;
+    const meta = document.createElement('div'); meta.className = 'list-meta';
+    const y = document.createElement('span'); y.textContent = r.year || 'year?';
+    const dot = document.createElement('span'); dot.className = 'dot'; dot.textContent = '\u00b7';
+    const ty = document.createElement('span'); ty.textContent = r.type === 'series' ? 'Series' : 'Movie';
+    meta.append(y, dot, ty);
+    info.append(title, meta);
+    btn.appendChild(info);
+    btn.onclick = () => { selected = r; renderSelected(); $('results').innerHTML = ''; $('q').value = ''; $('qClear').classList.remove('show'); setMsg('msg', ''); $('fDesc').focus(); };
     box.appendChild(btn);
   });
 }
@@ -281,23 +423,43 @@ function renderSelected(){
   const box = $('chipBox');
   if(!selected){ box.hidden = true; return; }
   box.hidden = false;
-  const img = $('chipPoster');
-  if(selected.poster){ img.src = selected.poster; img.hidden = false; img.referrerPolicy = 'no-referrer'; }
-  else img.hidden = true;
+  const t = $('chipThumb'); t.innerHTML = '';
+  if(selected.poster){
+    const img = document.createElement('img');
+    img.src = selected.poster; img.alt = selected.name; img.referrerPolicy = 'no-referrer';
+    img.onerror = () => { img.remove(); t.innerHTML = FILM_ICON; };
+    t.appendChild(img);
+  }else t.innerHTML = FILM_ICON;
   $('chipName').textContent = selected.name;
   $('chipMeta').textContent = (selected.year || '') + (selected.type === 'series' ? ' \u00b7 series \u00b7 shows on every episode' : ' \u00b7 movie');
 }
 $('chipClear').onclick = () => { selected = null; renderSelected(); };
 
-let debounce = null;
 $('q').addEventListener('input', () => {
-  clearTimeout(debounce);
-  debounce = setTimeout(doSearch, 400);
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(doSearch, 400);
 });
-$('q').addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); clearTimeout(debounce); doSearch(); } });
-$('qType').onchange = () => { if($('q').value.trim().length >= 3) doSearch(); };
+$('q').addEventListener('keydown', e => {
+  if(e.key === 'Enter'){ e.preventDefault(); clearTimeout(searchTimer); doSearch(); }
+  if(e.key === 'Escape'){ e.preventDefault(); clearSearch(); }
+});
+$('qClear').onclick = clearSearch;
+function clearSearch(){
+  clearTimeout(searchTimer);
+  $('q').value = '';
+  $('results').innerHTML = '';
+  $('qClear').classList.remove('show');
+  setMsg('msg', '');
+  $('q').focus();
+}
+$('pills').addEventListener('click', e => {
+  const b = e.target.closest('button'); if(!b) return;
+  qType = b.dataset.t;
+  [...$('pills').children].forEach(x => x.classList.toggle('on', x === b));
+  if($('q').value.trim().length >= 3) doSearch();
+});
 
-/* ---------- Add / edit form ---------- */
+/* ---------- add / edit form ---------- */
 function render(){
   $('count').textContent = links.length ? String(links.length) : '';
   const list = $('list'); list.innerHTML = '';
@@ -307,25 +469,24 @@ function render(){
     list.appendChild(e);
   }
   links.forEach(l => {
-    const row = document.createElement('div'); row.className = 'row';
-    const d = document.createElement('div');
+    const row = document.createElement('div'); row.className = 'link-row';
+    const li = document.createElement('div'); li.className = 'li';
     const b = document.createElement('b');
     b.textContent = l.imdb ? l.name + (l.type === 'series' ? ' (series)' : '') : l.title;
     if(!l.imdb){
-      const badge = document.createElement('span'); badge.className = 'badge'; badge.textContent = 'not attached';
+      const badge = document.createElement('span'); badge.className = 'count'; badge.textContent = 'not attached';
       b.appendChild(badge);
     }
     const s = document.createElement('small');
     s.textContent = (l.desc || '') + ' \u2014 ' + l.url;
-    d.append(b, s);
-    const ed = document.createElement('button'); ed.className = 'linkbtn'; ed.textContent = 'Edit';
-    ed.onclick = () => startEdit(l);
-    const del = document.createElement('button'); del.className = 'linkbtn del'; del.textContent = 'Delete';
-    del.onclick = async () => {
-      try{ links = await call('delete', { id: l.id }); if(editingId === l.id) stopEdit(); render(); }
-      catch(e){ handleAuth(e); }
-    };
-    row.append(d, ed, del);
+    li.append(b, s);
+    const btns = document.createElement('div'); btns.className = 'rowbtns';
+    const ed = document.createElement('button'); ed.type = 'button'; ed.textContent = 'Edit';
+    ed.onclick = () => { startEdit(l); $('formTitle').scrollIntoView({ behavior: 'smooth', block: 'center' }); };
+    const del = document.createElement('button'); del.type = 'button'; del.className = 'del'; del.textContent = 'Delete';
+    del.onclick = () => askDelete(l);
+    btns.append(ed, del);
+    row.append(li, btns);
     list.appendChild(row);
   });
 }
@@ -335,32 +496,36 @@ function startEdit(l){
   selected = l.imdb ? { imdb: l.imdb, type: l.type, name: l.name, year: '', poster: '' } : null;
   $('fDesc').value = l.desc || '';
   $('fUrl').value = l.url;
-  $('formTitle').textContent = 'Edit link' + (l.imdb ? '' : ' (old link \u2014 pick the title above to attach it)');
+  $('formTitle').textContent = 'Edit link';
+  $('formDesc').textContent = l.imdb
+    ? 'Change the description or the video link, then save.'
+    : 'This is an old link that is not attached yet — search the title above and select it to attach it.';
   $('add').textContent = 'Save changes';
   $('cancel').hidden = false;
   renderSelected();
   setMsg('msg', '');
-  if(!selected){ $('q').focus(); } else { $('fDesc').focus(); }
+  if(!selected) $('q').focus(); else $('fDesc').focus();
 }
 function stopEdit(){
   editingId = null;
   selected = null;
   $('fDesc').value = ''; $('fUrl').value = '';
-  $('formTitle').textContent = '2. Add the link';
+  $('formTitle').textContent = 'Add the link';
+  $('formDesc').textContent = 'It will appear as a play card on the title you selected above.';
   $('add').textContent = 'Add link';
   $('cancel').hidden = true;
   renderSelected();
 }
 
 function handleAuth(e){
-  if(e.status === 401){ show('login'); setMsg('lMsg', 'Session expired. Enter your password again.', 'bad'); }
-  else setMsg('msg', e.message, 'bad');
+  if(e.status === 401){ show('login'); setMsg('lMsg', 'Session expired. Enter your password again.', 'err'); }
+  else setMsg('msg', e.message, 'err');
 }
 
 $('add').onclick = async () => {
   const desc = $('fDesc').value.trim(), url = $('fUrl').value.trim();
-  if(!selected) return setMsg('msg', 'Search the movie or series by name and select it first.', 'bad');
-  if(!desc) return setMsg('msg', 'Enter the description.', 'bad');
+  if(!selected) return setMsg('msg', 'Search the movie or series by name and select it first.', 'err');
+  if(!desc) return setMsg('msg', 'Enter the description.', 'err');
   const payload = { id: editingId, imdb: selected.imdb, type: selected.type, metaName: selected.name, desc, url };
   try{
     links = await call(editingId ? 'update' : 'add', payload);
@@ -370,6 +535,32 @@ $('add').onclick = async () => {
 };
 $('cancel').onclick = () => { stopEdit(); setMsg('msg', ''); };
 
+/* ---------- delete confirmation ---------- */
+let pendingDelete = null;
+function askDelete(l){
+  pendingDelete = l;
+  $('delName').textContent = l.imdb ? l.name : l.title;
+  $('delUrl').textContent = l.url;
+  $('delOverlay').classList.add('open');
+  $('delCancel').focus();
+}
+function closeDelete(){ $('delOverlay').classList.remove('open'); pendingDelete = null; }
+$('delCancel').onclick = closeDelete;
+$('delOverlay').addEventListener('click', e => { if(e.target === $('delOverlay')) closeDelete(); });
+$('delConfirm').onclick = async () => {
+  const l = pendingDelete; closeDelete();
+  if(!l) return;
+  try{
+    links = await call('delete', { id: l.id });
+    if(editingId === l.id) stopEdit();
+    render();
+  }catch(e){ handleAuth(e); }
+};
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape' && $('delOverlay').classList.contains('open')) closeDelete();
+});
+
+/* ---------- install ---------- */
 $('copy').onclick = async () => {
   const u = location.origin + '/@' + user + '/manifest.json';
   try{ await navigator.clipboard.writeText(u); setMsg('msg', 'Install URL copied.', 'ok'); }
