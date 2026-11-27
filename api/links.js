@@ -64,6 +64,7 @@ module.exports = async (req, res) => {
       const imdb = String(b.imdb || '').trim().toLowerCase();
       const type = String(b.type || '').trim().toLowerCase();
       const metaName = String(b.metaName || '').trim().slice(0, 200);
+      const poster = String(b.poster || '').trim().slice(0, 500);
 
       if (!IMDB_RE.test(imdb)) return L.send(res, 400, { error: 'Search the movie or series by name and select it first' });
       if (type !== 'movie' && type !== 'series') return L.send(res, 400, { error: 'Invalid title type' });
@@ -71,9 +72,24 @@ module.exports = async (req, res) => {
       if (!desc) return L.send(res, 400, { error: 'Description is required' });
       if (!L.validUrl(url)) return L.send(res, 400, { error: 'Link must start with http:// or https://' });
 
+      // A series link covers every episode, unless a season + episode is given.
+      let se = null, ep = null;
+      if (type === 'series') {
+        const hasSe = b.se !== undefined && b.se !== null && b.se !== '';
+        const hasEp = b.ep !== undefined && b.ep !== null && b.ep !== '';
+        if (hasSe !== hasEp) return L.send(res, 400, { error: 'Season and episode are both needed for an episode-specific link' });
+        if (hasSe) {
+          se = Math.trunc(Number(b.se));
+          ep = Math.trunc(Number(b.ep));
+          if (!Number.isFinite(se) || !Number.isFinite(ep) || se < 1 || ep < 1 || se > 999 || ep > 999) {
+            return L.send(res, 400, { error: 'Season and episode must be numbers from 1 to 999' });
+          }
+        }
+      }
+
       const record = {
         id: action === 'add' ? crypto.randomBytes(5).toString('hex') : null,
-        imdb, type, name: metaName, desc, url,
+        imdb, type, name: metaName, desc, url, poster, se, ep,
         added: Date.now()
       };
 
