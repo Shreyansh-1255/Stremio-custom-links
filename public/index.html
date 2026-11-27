@@ -281,11 +281,12 @@ input:focus-visible,textarea:focus-visible,select:focus-visible{outline:none}
         <button class="btn" id="cancel" hidden>Cancel edit</button>
       </div>
       <div class="msg" id="fMsg" role="alert"></div>
-      <p class="note" style="margin-bottom:0">Series links appear on every episode — or only on the one you pick. Titles without a link show a &ldquo;No links found&rdquo; card &mdash; tapping it opens this page.</p>
+      <p class="note" style="margin-bottom:0">After saving, the server reads the file&rsquo;s size and subtitle hash from the video link, so subtitle addons can find the right subtitles. Series links appear on every episode — or only on the one you pick. Titles without a link show a &ldquo;No links found&rdquo; card &mdash; tapping it opens this page.</p>
     </section>
 
     <section class="card" id="listCard">
       <h2>Your links <span id="count" class="count"></span></h2>
+      <div class="actions" style="margin:0 0 10px"><button class="btn small" id="checkInfo" type="button" hidden>Check file info</button></div>
       <input class="filter" id="filter" type="search" placeholder="Filter your links" autocomplete="off" hidden>
       <div id="list"></div>
     </section>
@@ -671,6 +672,53 @@ $('epSwitch').addEventListener('click', () => {
   updateEpUI();
 });
 
+/* ---------- file info (size + subtitle hash read by the server) ---------- */
+function fmtSize(n){
+  n = Number(n); if(!(n > 0)) return '';
+  const u = ['B', 'KB', 'MB', 'GB', 'TB']; let i = 0;
+  while(n >= 1024 && i < u.length - 1){ n /= 1024; i++; }
+  return (i >= 3 ? n.toFixed(2) : n.toFixed(i ? 1 : 0)) + ' ' + u[i];
+}
+let probing = false;
+async function probeLink(id){
+  try{
+    links = await call('probe', { id });
+    render();
+    return links.find(x => x.id === id) || null;
+  }catch(e){
+    if(e.status === 401) handleErr(e);
+    else showToast(e.message, true);
+    return null;
+  }
+}
+function probeMsg(l){
+  if(!l) return null;
+  if(l.size && l.hash) return 'File info saved: ' + fmtSize(l.size) + ' + subtitle hash';
+  if(l.size) return 'Saved the size (' + fmtSize(l.size) + '). ' + (l.perr || 'The hash could not be read.');
+  return 'Could not read this file. ' + (l.perr || '') + ' It will still play.';
+}
+async function probeInBackground(id, prefix){
+  showToast((prefix ? prefix + ' ' : '') + 'Reading file info\u2026');
+  const l = await probeLink(id);
+  if(l) showToast(probeMsg(l), !l.size);
+}
+$('checkInfo').onclick = async () => {
+  if(probing) return;
+  const todo = links.filter(l => l.imdb && !l.size).map(l => l.id);
+  if(!todo.length) return;
+  probing = true; let ok = 0;
+  for(let i = 0; i < todo.length; i++){
+    $('checkInfo').disabled = true;
+    $('checkInfo').textContent = 'Checking ' + (i + 1) + ' of ' + todo.length + '\u2026';
+    const l = await probeLink(todo[i]);
+    if(l && l.size) ok++;
+    if(!acct) break; // session expired
+  }
+  probing = false; $('checkInfo').disabled = false;
+  render();
+  if(acct) showToast('File info saved for ' + ok + ' of ' + todo.length + ' links', ok === 0);
+};
+
 /* ---------- links list ---------- */
 const PAGE = 20;
 let shown = PAGE;
@@ -678,6 +726,9 @@ function render(){
   $('count').textContent = links.length ? String(links.length) : '';
   const q = $('filter').value.trim().toLowerCase();
   $('filter').hidden = links.length < 6;
+  const missing = links.filter(l => l.imdb && !l.size).length;
+  $('checkInfo').hidden = !missing;
+  if(!probing) $('checkInfo').textContent = 'Check file info (' + missing + ')';
   const list = $('list'); list.innerHTML = '';
   if(!links.length){
     const e = document.createElement('div'); e.className = 'empty';
@@ -708,13 +759,18 @@ function render(){
     if(!l.imdb){
       const pill = document.createElement('span'); pill.className = 'count'; pill.textContent = 'Not attached';
       tags.appendChild(pill);
+    }else if(!l.size || !l.hash){
+      const pill = document.createElement('span'); pill.className = 'count';
+      pill.textContent = l.size ? 'No hash' : 'No file info';
+      pill.title = l.perr || 'Subtitles may not match until the file info is read';
+      tags.appendChild(pill);
     }
     if(tags.children.length) li.appendChild(tags);
     if(l.desc){
       const d = document.createElement('small'); d.className = 'd'; d.textContent = l.desc; d.title = l.desc;
       li.appendChild(d);
     }
-    const h = hostOf(l.url);
+    const h = [hostOf(l.url), fmtSize(l.size)].filter(Boolean).join(' \u00b7 ');
     if(h){ const hs = document.createElement('small'); hs.className = 'host'; hs.textContent = h; li.appendChild(hs); }
     const btns = document.createElement('div'); btns.className = 'rowbtns';
     const ed = document.createElement('button'); ed.type = 'button'; ed.textContent = 'Edit';
@@ -802,13 +858,19 @@ $('add').onclick = async () => {
     }
   }
   const wasEdit = !!editingId;
+  const editedId = editingId;
+  const oldLink = wasEdit ? links.find(x => x.id === editedId) : null;
   const payload = { id: editingId, imdb: selected.imdb, type: selected.type, metaName: selected.name, desc, url, poster: selected.poster || '', se, ep };
   saving = true; $('add').disabled = true;
   try{
     links = await call(wasEdit ? 'update' : 'add', payload);
     stopEdit(); shown = PAGE; $('filter').value = ''; render();
-    showToast(wasEdit ? 'Changes saved' : 'Link added');
     $('listCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // read size + subtitle hash from the video URL (new link, changed URL, or never read before)
+    const saved = wasEdit ? links.find(x => x.id === editedId) : links[links.length - 1];
+    if(saved && saved.imdb && (!wasEdit || !oldLink || oldLink.url !== url || !saved.size)){
+      probeInBackground(saved.id, wasEdit ? 'Changes saved.' : 'Link added.');
+    }else showToast(wasEdit ? 'Changes saved' : 'Link added');
   }catch(e){ handleErr(e, 'fMsg'); }
   finally{ saving = false; $('add').disabled = false; }
 };
