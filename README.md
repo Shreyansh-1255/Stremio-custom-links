@@ -1,12 +1,12 @@
-# Stremio Custom Links (v5.4.0)
+# Stremio Custom Links (v5.4.1)
 
-A Stremio addon (works in Nuvio too) to attach your own video links to movies and series. Titles are found by **searching the name** (Cinemeta). The addon has **no catalog and no poster of its own** — every link plays directly on the original movie/series card. Every user gets a personal page and install URL, protected by their own password. Built without the Stremio addon SDK.
+A Stremio addon (works in Nuvio too) to attach your own video links to movies and series. Titles are found by **searching the name** (IMDb suggestions first, then Cinemeta). The addon has **no catalog and no poster of its own** — every link plays directly on the original movie/series card. Every user gets a personal page and install URL, protected by their own password. Built without the Stremio addon SDK.
 
 ## How it works
 
 - `/` : if you are already logged in (cookie), you go straight to your page `/@username` — no username/password asked. Otherwise the login screen opens.
 - `/@username` : login screen with two tabs, **Log in** and **Register**. The username field has a fixed `@` in front and shows your page URL live. You stay logged in with a 30-day cookie (renewed every visit) until you press **Logout**.
-- `/@username/manifest.json` : your addon install URL — works in Stremio and Nuvio
+- `/@username/manifest.json` : your addon install URL — works in Stremio and Nuvio (the page has **Install in Stremio** and **Install in Nuvio** buttons)
 
 ## Streams
 
