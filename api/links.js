@@ -2,7 +2,10 @@
 // cookie is missing; on success the server sets a 30-day HttpOnly session
 // cookie, so page reloads never ask the password again until Logout clears
 // it (or the cookie is gone).
-// action: list | add | update | delete | logout
+// action: list | add | update | delete | probe | logout
+// probe {id}: reads the file's size, OpenSubtitles hash and name from the video
+// URL with HTTP Range requests and saves them on the link (size / hash / fname),
+// so the addon can send videoSize, videoHash and filename to Stremio.
 // A link is attached to a movie/series found by searching Cinemeta:
 //   { imdb: 'tt0111161', type: 'movie', metaName: 'The Shawshank Redemption',
 //     desc: 'The.Shawshank.Redemption.1994.720p.BluRay...mkv', url: 'https://...' }
@@ -10,6 +13,7 @@
 // edited (which attaches them) or deleted.
 const crypto = require('crypto');
 const L = require('./_lib');
+const { probe } = require('./_probe');
 
 const MAX_LINKS = 200;
 const IMDB_RE = /^tt\d{5,}$/;
@@ -58,6 +62,25 @@ module.exports = async (req, res) => {
 
     if (action === 'list') return L.send(res, 200, links);
 
+    if (action === 'probe') {
+      const item = links.find(l => l.id === b.id);
+      if (!item) return L.send(res, 404, { error: 'Link not found' });
+      if (await L.hit(`rl:probe:${name}`, 3600) > 300) return L.send(res, 429, { error: 'Too many file checks. Try again in an hour.' });
+      const info = await probe(item.url); // slow part: never throws
+      // re-read the account so links added/edited meanwhile are not overwritten
+      const fresh = (await L.getUser(name)) || user;
+      const cur = (fresh.links || []).find(l => l.id === b.id);
+      if (cur && cur.url === item.url) {
+        cur.size = info.size || null;
+        cur.hash = info.hash || null;
+        cur.fname = info.fname || null;
+        cur.perr = info.error || null;
+        cur.probed = Date.now();
+        await L.saveUser(name, fresh);
+      }
+      return L.send(res, 200, fresh.links || []);
+    }
+
     if (action === 'add' || action === 'update') {
       const desc = String(b.desc || '').trim().slice(0, 300);
       const url = String(b.url || '').trim().slice(0, 2000);
@@ -90,6 +113,7 @@ module.exports = async (req, res) => {
       const record = {
         id: action === 'add' ? crypto.randomBytes(5).toString('hex') : null,
         imdb, type, name: metaName, desc, url, poster, se, ep,
+        size: null, hash: null, fname: null, perr: null, probed: null,
         added: Date.now()
       };
 
@@ -101,6 +125,10 @@ module.exports = async (req, res) => {
         if (!item) return L.send(res, 404, { error: 'Link not found' });
         record.id = item.id;
         record.added = item.added;
+        if (item.url === url) { // same video link: keep the file info already read
+          record.size = item.size || null; record.hash = item.hash || null; record.fname = item.fname || null;
+          record.perr = item.perr || null; record.probed = item.probed || null;
+        }
         links[links.indexOf(item)] = record;
       }
     } else if (action === 'delete') {
