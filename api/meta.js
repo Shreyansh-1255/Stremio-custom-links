@@ -1,7 +1,7 @@
 // GET /api/meta?imdb=tt0903747
 // Season + episode list for one series, from the Cinemeta meta API, so the
 // website can show season/episode dropdowns (with episode names) instead of
-// manual numbers. Cached in Redis for 10 minutes; 30 requests per IP per minute.
+// manual numbers. Cached in Redis for 10 minutes. No rate limit.
 const L = require('./_lib');
 
 const TTL = 600;
@@ -13,11 +13,6 @@ module.exports = async (req, res) => {
     const q = req.query || Object.fromEntries(new URL(req.url, 'http://x').searchParams);
     const imdb = String(q.imdb || '').trim().toLowerCase();
     if (!/^tt\d+$/.test(imdb)) return L.send(res, 400, { error: 'Invalid title' });
-
-    // 30 requests per IP per minute (same style as /api/search)
-    if ((await L.hit(`rl:meta:${L.ipOf(req)}`, 60)) > 30) {
-      return L.send(res, 429, { error: 'Too many requests. Try again in a minute.' });
-    }
 
     const cacheKey = `meta:${imdb}`;
     try {
