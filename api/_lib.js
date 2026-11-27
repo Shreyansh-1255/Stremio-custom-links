@@ -1,4 +1,5 @@
-// Shared helpers: Upstash Redis REST client, password hashing, rate limiting.
+// Shared helpers: Upstash Redis REST client, password hashing, rate limiting,
+// login sessions (HttpOnly cookie, 30 days).
 const crypto = require('crypto');
 
 const DB_URL = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_KV_REST_API_URL;
@@ -58,6 +59,38 @@ function checkPassword(pw, user) {
   } catch { return false; }
 }
 
+/* ---------- login sessions (cookie) ---------- */
+const COOKIE = 'sid';
+const SESSION_TTL = 30 * 24 * 3600; // 30 days
+
+function parseCookies(header) {
+  const out = {};
+  String(header || '').split(';').forEach(p => {
+    const i = p.indexOf('=');
+    if (i > 0) { try { out[p.slice(0, i).trim()] = decodeURIComponent(p.slice(i + 1).trim()); } catch { out[p.slice(0, i).trim()] = p.slice(i + 1).trim(); } }
+  });
+  return out;
+}
+
+// A session is a random 64-hex token stored in Redis (s:<token> -> username).
+async function createSession(name) {
+  const token = crypto.randomBytes(32).toString('hex');
+  await cmd(['SET', 's:' + token, name, 'EX', String(SESSION_TTL)]);
+  return token;
+}
+// Returns the username the token belongs to, or null.
+async function getSession(token) {
+  if (!token || !/^[a-f0-9]{64}$/.test(token)) return null;
+  return (await cmd(['GET', 's:' + token])) || null;
+}
+async function deleteSession(token) {
+  if (!token) return;
+  try { await cmd(['DEL', 's:' + token]); } catch (_) {}
+}
+
+const sessionCookie = token => `${COOKIE}=${token}; Path=/; Max-Age=${SESSION_TTL}; HttpOnly; Secure; SameSite=Lax`;
+const clearSessionCookie = () => `${COOKIE}=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=Lax`;
+
 function ipOf(req) {
   return String(req.headers['x-forwarded-for'] || (req.socket && req.socket.remoteAddress) || 'unknown')
     .split(',')[0].trim();
@@ -76,5 +109,7 @@ function validUrl(u) {
 
 module.exports = {
   cmd, send, parseBody, NAME_RE, normName, getUser, saveUser, createUser,
-  hashPassword, checkPassword, ipOf, hits, hit, validUrl
+  hashPassword, checkPassword, ipOf, hits, hit, validUrl,
+  COOKIE, SESSION_TTL, parseCookies, createSession, getSession, deleteSession,
+  sessionCookie, clearSessionCookie
 };
