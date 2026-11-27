@@ -2,11 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="referrer" content="no-referrer">
 <title>Custom Links for Stremio &amp; Nuvio</title>
 <meta name="theme-color" content="#100e0c">
-<script>try{if(localStorage.getItem("cl_theme")==="light"){document.documentElement.setAttribute("data-theme","light");document.querySelector('meta[name="theme-color"]').setAttribute("content","#f3ecdc");}}catch(e){}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=DM+Sans:wght@400;500;600;700&display=swap">
 <style>
@@ -15,40 +14,35 @@
   --text:#f1e9d8; --muted:#8f8471; --gold:#cda24e; --danger:#8c3b34; --danger-ink:#e07a6a;
   --radius-s:6px; --radius-m:10px;
 }
-:root[data-theme="light"]{
-  color-scheme:light;
-  --bg:#f3ecdc; --surface:#faf5e8; --surface-2:#ece3cd; --line:#ddd1b6;
-  --text:#2b2318; --muted:#6e624d; --gold:#8f6212; --danger:#8c3b34; --danger-ink:#8c3b34;
-}
-.theme-anim,.theme-anim *{transition:background-color .25s ease,color .25s ease,border-color .25s ease,fill .25s ease,stroke .25s ease!important}
-@media (prefers-reduced-motion:reduce){.theme-anim,.theme-anim *{transition:none!important}}
-*{box-sizing:border-box}
-html,body{margin:0;padding:0}
-body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;line-height:1.5;min-height:100vh}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{touch-action:pan-x pan-y;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;line-height:1.5;min-height:100vh;margin:0;padding:0}
 button{font-family:inherit;cursor:pointer}
+button,.switch,.pills button,.rowbtns button,.s-clear,.chip>button,.list-row,.rowbtns,.actions .btn{
+  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+a,img{-webkit-user-drag:none}
+a,button,.list-row,.pills button,.rowbtns button,.s-clear,.chip>button,.switch{touch-action:manipulation}
+input,textarea{-webkit-user-select:text;user-select:text}
+textarea{resize:none}
+input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+input[type=number]{-moz-appearance:textfield;appearance:textfield}
 svg{display:block}
 a{color:inherit}
-main{max-width:480px;margin:0 auto;padding:28px 16px 64px}
+main{max-width:480px;margin:0 auto;padding:24px 16px 64px}
 [hidden]{display:none!important}
-
-/* ---------- header ---------- */
-.head-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px}
-.head-row .mark{width:26px;height:26px;flex:none;margin-top:3px;color:var(--gold)}
-h1{font-family:'Fraunces',serif;font-size:22px;font-weight:700;margin:0 0 4px;line-height:1.2}
-.sub{color:var(--muted);font-size:12.5px;margin:0}
 
 /* ---------- set-box style cards ---------- */
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-m);padding:18px;margin-top:14px}
 .card h2{font-size:16px;margin:0 0 4px;font-weight:700;font-family:'Fraunces',serif}
 .card .desc{font-size:12px;color:var(--muted);line-height:1.5;margin:0 0 12px}
+.logged{color:var(--muted);font-size:12.5px;margin:2px 0 0}
+.logged b{color:var(--text);font-weight:600}
 label{display:block;font-size:11px;color:var(--muted);margin:10px 0 5px}
 input,textarea{display:block;width:100%;font-size:13px;padding:10px 11px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;color:var(--text);outline:none;font-family:inherit}
 input:focus,textarea:focus{border-color:var(--gold)}
-textarea{resize:vertical;min-height:56px}
 .static{font-size:13px;padding:9px 11px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px}
 .urlbox{font-size:12.5px;word-break:break-all;margin-bottom:0}
 .actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
-.actions.tight{margin-top:0}
 .btn{padding:10px 14px;border-radius:8px;border:1px solid var(--line);background:var(--surface-2);color:var(--text);font-size:13px;font-weight:600;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px}
 .btn:hover{border-color:var(--muted)}
 .btn.primary{background:var(--gold);border-color:var(--gold);color:#1a1409}
@@ -60,6 +54,7 @@ textarea{resize:vertical;min-height:56px}
 .msg.err{color:var(--danger-ink)}
 .note{font-size:11px;color:var(--muted);line-height:1.5;margin:14px 0 0}
 .count{font-size:11px;color:var(--muted);border:1px solid var(--line);border-radius:99px;padding:2px 8px;margin-left:8px;vertical-align:middle;font-family:'DM Sans',sans-serif}
+.ep-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
 
 /* ---------- toggle (OpenStream switch) ---------- */
 .toggle-row{display:flex;align-items:center;gap:12px;padding:10px 11px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;margin-top:14px}
@@ -77,7 +72,6 @@ textarea{resize:vertical;min-height:56px}
 .search-row input{flex:1;min-width:0;background:transparent;border:0;padding:12px 0;font-size:15px}
 .search-row input:focus{border-color:transparent}
 .search-row input::placeholder{color:#6b6252}
-:root[data-theme="light"] .search-row input::placeholder{color:#a09377}
 .s-clear{width:34px;height:34px;border-radius:50%;background:var(--surface);border:1px solid var(--line);display:none;align-items:center;justify-content:center;flex-shrink:0;padding:0}
 .s-clear.show{display:flex}
 .s-clear svg{width:14px;height:14px;stroke:var(--text)}
@@ -105,13 +99,13 @@ textarea{resize:vertical;min-height:56px}
 .chip>button{width:32px;height:32px;border-radius:50%;background:var(--surface);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0}
 .chip>button svg{width:13px;height:13px;stroke:var(--muted)}
 
-/* ---------- links list ---------- */
+/* ---------- links list: poster + name + description only ---------- */
 .link-row{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
 .link-row:last-child{border-bottom:0}
 .link-row .li{flex:1;min-width:0}
 .link-row .li b{font-family:'Fraunces',serif;font-weight:600;font-size:15px;line-height:1.3;display:block}
-.link-row .li small{display:block;color:var(--muted);font-size:11.5px;margin-top:4px;word-break:break-all}
-.rowbtns{display:flex;gap:6px;flex-shrink:0}
+.link-row .li small{display:block;color:var(--muted);font-size:11.5px;margin-top:4px;line-height:1.45}
+.rowbtns{display:flex;gap:6px;flex-shrink:0;align-self:center}
 .rowbtns button{height:32px;padding:0 12px;border-radius:8px;border:1px solid var(--line);background:var(--surface-2);color:var(--text);font-size:12px;font-weight:600}
 .rowbtns button:hover{border-color:var(--muted)}
 .rowbtns .del{color:var(--danger-ink)}
@@ -120,68 +114,46 @@ textarea{resize:vertical;min-height:56px}
 /* ---------- confirm modal (OpenStream set-overlay style) ---------- */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;padding:16px;z-index:100}
 .overlay.open{display:flex}
-:root[data-theme="light"] .overlay{background:rgba(50,38,20,.45)}
 .modal{width:100%;max-width:360px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-m);padding:18px}
 .modal h3{font-size:16px;margin:0 0 4px;font-family:'Fraunces',serif}
 .modal p{font-size:12.5px;color:var(--muted);line-height:1.5;margin:0}
 .modal .target{font-size:13px;padding:9px 11px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;margin:10px 0 2px;min-width:0}
 .modal .target b{display:block;font-family:'Fraunces',serif;font-weight:600;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.modal .target small{display:block;color:var(--muted);font-size:11px;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.modal .target small{display:block;color:var(--muted);font-size:11px;margin-top:2px;line-height:1.4}
+
+/* ---------- toast (OpenStream playToast style) ---------- */
+#clToast{position:fixed;left:16px;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));max-width:420px;margin:0 auto;z-index:1000;display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;background:var(--surface-2);color:var(--text);border:1px solid var(--gold);font-size:13px;line-height:1.35;box-shadow:0 8px 30px rgba(0,0,0,.5);opacity:0;transform:translateY(16px);pointer-events:none;transition:opacity .2s,transform .2s}
+#clToast.show{opacity:1;transform:none;pointer-events:auto}
+#clToast span{flex:1}
+#clToast button{background:none;border:0;color:var(--muted);font-size:20px;line-height:1;padding:0 2px;cursor:pointer}
 @media (max-width:400px){ main{padding:20px 12px 56px} .card{padding:14px} }
 </style>
 </head>
 <body>
 <main>
-  <div class="head-row">
-    <svg class="mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3h18v18H3z"/><path d="M7 3v18M17 3v18M3 8h4M3 16h4M17 8h4M17 16h4"/></svg>
-    <div>
-      <h1>Custom Links</h1>
-      <p class="sub">Attach your own video links to movies and series — they play right on the original title card in Stremio and Nuvio.</p>
-    </div>
-  </div>
-  <div class="toggle-row">
-    <div class="tx"><b>Light theme</b><small>OpenStream's cream look. Off = the dark theme.</small></div>
-    <button type="button" class="switch" id="themeSwitch" role="switch" aria-checked="false" aria-label="Light theme"><i></i></button>
-  </div>
-
-  <!-- Home -->
-  <div id="home">
+  <!-- Log in / Register -->
+  <div id="auth">
     <section class="card">
-      <h2>Open or create your page</h2>
-      <p class="desc">Pick a username — it becomes part of your personal addon URL.</p>
+      <h2>Log in or create your page</h2>
+      <p class="desc">New here? Register creates the account with this username and password. A lost password can't be reset.</p>
       <label>Username
-        <input id="hName" placeholder="yourname" maxlength="20" autocapitalize="none" autocomplete="off" spellcheck="false">
+        <input id="aName" placeholder="yourname" maxlength="20" autocapitalize="none" autocomplete="off" spellcheck="false">
       </label>
-      <div class="actions"><button class="btn primary" id="go">Continue</button></div>
-      <div class="msg" id="hMsg"></div>
-    </section>
-    <section class="card">
-      <h2>How it works</h2>
-      <p class="desc" style="margin:0">1. Pick a username and set a password &nbsp;·&nbsp; 2. Search a movie or series by name and select it &nbsp;·&nbsp; 3. Paste your description and video link &nbsp;·&nbsp; 4. Install your addon URL in Stremio or Nuvio.</p>
+      <label>Password
+        <input id="aPw" type="password" autocomplete="current-password">
+      </label>
+      <div class="actions">
+        <button class="btn primary" id="loginBtn">Log in</button>
+        <button class="btn" id="regBtn">Register</button>
+      </div>
+      <div class="msg" id="aMsg"></div>
     </section>
   </div>
-
-  <!-- New user -->
-  <section class="card" id="claim" hidden>
-    <h2>Create your page</h2>
-    <p class="desc">This username is free. Set a password for it — a lost password can't be reset.</p>
-    <label>Password <input id="cPw" type="password" autocomplete="new-password"></label>
-    <label>Repeat password <input id="cPw2" type="password" autocomplete="new-password"></label>
-    <div class="actions"><button class="btn primary" id="create">Create page</button></div>
-    <div class="msg" id="cMsg"></div>
-  </section>
-
-  <!-- Existing user -->
-  <section class="card" id="login" hidden>
-    <h2>Enter your password</h2>
-    <p class="desc">You stay logged in on this device until you press Logout.</p>
-    <label>Password <input id="lPw" type="password" autocomplete="current-password"></label>
-    <div class="actions"><button class="btn primary" id="unlock">Log in</button></div>
-    <div class="msg" id="lMsg"></div>
-  </section>
 
   <!-- Manager -->
   <div id="app" hidden>
+    <p class="logged">Logged in as <b id="whoami"></b></p>
+
     <section class="card">
       <h2>Search a movie or series</h2>
       <p class="desc">Found on Cinemeta — the same titles Stremio and Nuvio show.</p>
@@ -210,6 +182,14 @@ textarea{resize:vertical;min-height:56px}
     <section class="card">
       <h2 id="formTitle">Add the link</h2>
       <p class="desc" id="formDesc">It will appear as a play card on the title you selected above.</p>
+      <div class="toggle-row" id="epRow" hidden>
+        <div class="tx"><b>All episodes</b><small>Off = the link shows only on the season and episode below.</small></div>
+        <button type="button" class="switch" id="epSwitch" role="switch" aria-checked="true" aria-label="All episodes"><i></i></button>
+      </div>
+      <div class="ep-grid" id="epFields" hidden>
+        <label>Season <input id="fSe" type="number" inputmode="numeric" min="1" max="999" placeholder="1"></label>
+        <label>Episode <input id="fEp" type="number" inputmode="numeric" min="1" max="999" placeholder="2"></label>
+      </div>
       <label>Description shown under the title
         <textarea id="fDesc" maxlength="300" placeholder="e.g. The.Shawshank.Redemption.1994.720p.BluRay.Hindi.English.DD5.1.x264.ESubs.mkv"></textarea>
       </label>
@@ -220,7 +200,7 @@ textarea{resize:vertical;min-height:56px}
         <button class="btn primary" id="add">Add link</button>
         <button class="btn" id="cancel" hidden>Cancel edit</button>
       </div>
-      <p class="note" style="margin-bottom:0">Series links appear on every episode. Titles without a link show a &ldquo;no link added in this title&rdquo; card.</p>
+      <p class="note" style="margin-bottom:0">Series links appear on every episode — or only on the one you pick. Titles without a link show a &ldquo;no link added in this title&rdquo; card.</p>
     </section>
 
     <section class="card">
@@ -247,7 +227,7 @@ textarea{resize:vertical;min-height:56px}
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="delTitle">
     <h3 id="delTitle">Delete this link?</h3>
     <p>This removes it from your addon. This can't be undone.</p>
-    <div class="target"><b id="delName"></b><small id="delUrl"></small></div>
+    <div class="target"><b id="delName"></b><small id="delDesc"></small></div>
     <div class="actions">
       <button class="btn" id="delCancel">Cancel</button>
       <button class="btn danger" id="delConfirm">Delete</button>
@@ -255,48 +235,29 @@ textarea{resize:vertical;min-height:56px}
   </div>
 </div>
 
+<!-- Toast (OpenStream playToast style) -->
+<div id="clToast" role="status"><span id="toastText"></span><button id="toastClose" aria-label="Dismiss">&times;</button></div>
+
 <script>
 const $ = id => document.getElementById(id);
 const NAME_RE = /^[a-z0-9_]{3,20}$/;
-const m = location.pathname.match(/^\/@([A-Za-z0-9_]{3,20})(?:\/configure)?\/?$/);
-const user = m ? m[1].toLowerCase() : null;
 let links = [];
+let acct = null;            // the logged-in username
 let editingId = null;
 let selected = null;        // { imdb, type, name, year, poster }
 let searchTimer = null;
 let searchSeq = 0;
 let qType = 'all';
 
-/* ---------- theme (OpenStream style) ---------- */
-const themeSwitch = $('themeSwitch');
-function applyTheme(light, save){
-  document.documentElement.classList.add('theme-anim');
-  clearTimeout(applyTheme.t);
-  applyTheme.t = setTimeout(() => document.documentElement.classList.remove('theme-anim'), 350);
-  if(light){
-    document.documentElement.setAttribute('data-theme', 'light');
-    document.querySelector('meta[name="theme-color"]').setAttribute('content', '#f3ecdc');
-  }else{
-    document.documentElement.removeAttribute('data-theme');
-    document.querySelector('meta[name="theme-color"]').setAttribute('content', '#100e0c');
-  }
-  themeSwitch.setAttribute('aria-checked', String(light));
-  if(save){ try{ localStorage.setItem('cl_theme', light ? 'light' : 'dark'); }catch(e){} }
-}
-applyTheme(document.documentElement.getAttribute('data-theme') === 'light', false);
-themeSwitch.addEventListener('click', () => {
-  applyTheme(document.documentElement.getAttribute('data-theme') !== 'light', true);
-});
-
 /* ---------- helpers ---------- */
 function setMsg(id, t, cls){ const e = $(id); e.textContent = t; e.className = 'msg' + (cls ? ' ' + cls : ''); }
-function show(which){ ['home', 'claim', 'login', 'app'].forEach(k => { if($(k)) $(k).hidden = k !== which; }); }
+function show(which){ ['auth', 'app'].forEach(k => { $(k).hidden = k !== which; }); }
 const FILM_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3h18v18H3z"/><path d="M7 3v18M17 3v18M3 8h4M3 16h4M17 8h4M17 16h4"/></svg>';
 function thumbNode(poster, alt){
   const t = document.createElement('div'); t.className = 'list-thumb';
   if(poster){
     const img = document.createElement('img');
-    img.src = poster; img.loading = 'lazy'; img.alt = alt || '';
+    img.src = poster; img.loading = 'lazy'; img.alt = alt || ''; img.referrerPolicy = 'no-referrer';
     img.onerror = () => { img.remove(); t.innerHTML = FILM_ICON; };
     t.appendChild(img);
   }else t.innerHTML = FILM_ICON;
@@ -310,66 +271,78 @@ async function post(path, body){
   return j;
 }
 // The server keeps us logged in with an HttpOnly cookie; the password is only
-// sent once, when logging in (or right after creating the account).
-const call = (action, extra) => post('/api/links', { name: user, action, ...(extra || {}) });
+// sent once, when logging in (or right after registering).
+const call = (action, extra) => post('/api/links', { name: acct, action, ...(extra || {}) });
 
-/* ---------- Home ---------- */
-function startHome(){
-  show('home');
-  if(location.pathname.startsWith('/@')) setMsg('hMsg', 'That username is not valid. Use 3-20 letters, numbers or underscores.', 'err');
-  const go = () => {
-    const n = $('hName').value.trim().replace(/^@/, '').toLowerCase();
-    if(!NAME_RE.test(n)) return setMsg('hMsg', 'Use 3-20 letters, numbers or underscores.', 'err');
-    location.href = '/@' + n;
-  };
-  $('go').onclick = go;
-  $('hName').addEventListener('keydown', e => { if(e.key === 'Enter') go(); });
+/* ---------- toast (OpenStream style) ---------- */
+let toastTimer = null;
+function showToast(msg){
+  $('toastText').textContent = msg;
+  $('clToast').classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => $('clToast').classList.remove('show'), 4000);
 }
+$('toastClose').onclick = () => { $('clToast').classList.remove('show'); clearTimeout(toastTimer); };
 
-/* ---------- User page ---------- */
-// The cookie decides everything: valid cookie -> straight into the app,
-// no cookie / logged out -> password screen, unknown name -> create screen.
-async function startUser(){
-  try{
-    links = await call('list');
-    return showApp();
-  }catch(e){
-    if(e.status === 404) return show('claim');
-    if(e.status === 401) return show('login');
-    show('login'); setMsg('lMsg', 'Could not reach the server. ' + e.message, 'err');
-  }
+/* ---------- log in / register (one form) ---------- */
+function showAuth(){
+  show('auth');
+  const mn = location.pathname.match(/^\/@([A-Za-z0-9_]{3,20})(?:\/configure)?\/?$/);
+  if(mn) $('aName').value = mn[1].toLowerCase();
 }
-
-async function login(password){
-  links = await call('list', { password });
-  showApp();
-}
-
-$('create').onclick = async () => {
-  const p1 = $('cPw').value, p2 = $('cPw2').value;
-  if(p1.length < 6) return setMsg('cMsg', 'Password must be at least 6 characters.', 'err');
-  if(p1 !== p2) return setMsg('cMsg', 'Passwords do not match.', 'err');
-  try{
-    await post('/api/user', { name: user, password: p1 });
-    await login(p1);
-    $('cPw').value = $('cPw2').value = '';
-  }catch(e){ setMsg('cMsg', e.message, 'err'); }
-};
-
-$('unlock').onclick = () => tryUnlock();
-$('lPw').addEventListener('keydown', e => { if(e.key === 'Enter') tryUnlock(); });
-async function tryUnlock(){
-  try{ await login($('lPw').value); $('lPw').value = ''; }
-  catch(e){ setMsg('lMsg', e.message, 'err'); }
-}
-
 function showApp(){
   show('app');
-  render(); renderSelected();
-  const path = '/@' + user + '/manifest.json';
+  $('whoami').textContent = '@' + acct;
+  render(); renderSelected(); updateEpUI();
+  const path = '/@' + acct + '/manifest.json';
   $('manifestUrl').textContent = location.origin + path;
   $('open').href = 'stremio://' + location.host + path;
 }
+function afterAuth(){
+  // same page -> straight in; came from "/" -> move to the /@name URL
+  const mn = location.pathname.match(/^\/@([A-Za-z0-9_]{3,20})(?:\/configure)?\/?$/);
+  if(mn && mn[1].toLowerCase() === acct){ showApp(); return; }
+  location.href = '/@' + acct;
+}
+
+async function doLogin(){
+  const n = $('aName').value.trim().replace(/^@/, '').toLowerCase();
+  const pw = $('aPw').value;
+  if(!NAME_RE.test(n)) return setMsg('aMsg', 'Username: 3-20 letters, numbers or underscores.', 'err');
+  if(!pw) return setMsg('aMsg', 'Enter your password.', 'err');
+  try{
+    links = await post('/api/links', { name: n, action: 'list', password: pw }); // server sets the cookie
+    acct = n;
+    $('aPw').value = '';
+    afterAuth();
+  }catch(e){
+    if(e.status === 404) setMsg('aMsg', 'No account with this name — tap Register to create it.', 'err');
+    else if(e.status === 401) setMsg('aMsg', 'Wrong password.', 'err');
+    else setMsg('aMsg', e.message, 'err');
+  }
+}
+
+async function doRegister(){
+  const n = $('aName').value.trim().replace(/^@/, '').toLowerCase();
+  const pw = $('aPw').value;
+  if(!NAME_RE.test(n)) return setMsg('aMsg', 'Username: 3-20 letters, numbers or underscores.', 'err');
+  if(pw.length < 6) return setMsg('aMsg', 'Password must be at least 6 characters.', 'err');
+  try{
+    await post('/api/user', { name: n, password: pw });
+    links = await post('/api/links', { name: n, action: 'list', password: pw }); // server sets the cookie
+    acct = n;
+    $('aPw').value = '';
+    afterAuth();
+  }catch(e){
+    if(e.status === 409) setMsg('aMsg', 'That username is already taken — log in instead.', 'err');
+    else setMsg('aMsg', e.message, 'err');
+  }
+}
+
+$('loginBtn').onclick = doLogin;
+$('regBtn').onclick = doRegister;
+$('aPw').addEventListener('keydown', e => { if(e.key === 'Enter') doLogin(); });
+$('aName').addEventListener('keydown', e => { if(e.key === 'Enter') $('aPw').focus(); });
 
 /* ---------- search (Cinemeta via /api/search) ---------- */
 async function doSearch(){
@@ -414,7 +387,7 @@ function renderResults(list){
     meta.append(y, dot, ty);
     info.append(title, meta);
     btn.appendChild(info);
-    btn.onclick = () => { selected = r; renderSelected(); $('results').innerHTML = ''; $('q').value = ''; $('qClear').classList.remove('show'); setMsg('msg', ''); $('fDesc').focus(); };
+    btn.onclick = () => { selected = r; renderSelected(); updateEpUI(); $('results').innerHTML = ''; $('q').value = ''; $('qClear').classList.remove('show'); setMsg('msg', ''); $('fDesc').focus(); };
     box.appendChild(btn);
   });
 }
@@ -431,9 +404,9 @@ function renderSelected(){
     t.appendChild(img);
   }else t.innerHTML = FILM_ICON;
   $('chipName').textContent = selected.name;
-  $('chipMeta').textContent = (selected.year || '') + (selected.type === 'series' ? ' \u00b7 series \u00b7 shows on every episode' : ' \u00b7 movie');
+  $('chipMeta').textContent = (selected.year || '') + (selected.type === 'series' ? ' \u00b7 series' : ' \u00b7 movie');
 }
-$('chipClear').onclick = () => { selected = null; renderSelected(); };
+$('chipClear').onclick = () => { selected = null; renderSelected(); updateEpUI(); };
 
 $('q').addEventListener('input', () => {
   clearTimeout(searchTimer);
@@ -459,6 +432,18 @@ $('pills').addEventListener('click', e => {
   if($('q').value.trim().length >= 3) doSearch();
 });
 
+/* ---------- episode picker (series only) ---------- */
+function epSwitchOn(){ return $('epSwitch').getAttribute('aria-checked') === 'true'; }
+function updateEpUI(){
+  const isSeries = !!(selected && selected.type === 'series');
+  $('epRow').hidden = !isSeries;
+  $('epFields').hidden = !isSeries || epSwitchOn();
+}
+$('epSwitch').addEventListener('click', () => {
+  $('epSwitch').setAttribute('aria-checked', String(!epSwitchOn()));
+  updateEpUI();
+});
+
 /* ---------- add / edit form ---------- */
 function render(){
   $('count').textContent = links.length ? String(links.length) : '';
@@ -470,15 +455,21 @@ function render(){
   }
   links.forEach(l => {
     const row = document.createElement('div'); row.className = 'link-row';
+    row.appendChild(thumbNode(l.poster, l.name));
     const li = document.createElement('div'); li.className = 'li';
     const b = document.createElement('b');
-    b.textContent = l.imdb ? l.name + (l.type === 'series' ? ' (series)' : '') : l.title;
+    b.textContent = l.imdb ? l.name : l.title;
+    if(l.se){
+      const pill = document.createElement('span'); pill.className = 'count';
+      pill.textContent = 'S' + l.se + ' E' + l.ep;
+      b.appendChild(pill);
+    }
     if(!l.imdb){
-      const badge = document.createElement('span'); badge.className = 'count'; badge.textContent = 'not attached';
-      b.appendChild(badge);
+      const pill = document.createElement('span'); pill.className = 'count'; pill.textContent = 'not attached';
+      b.appendChild(pill);
     }
     const s = document.createElement('small');
-    s.textContent = (l.desc || '') + ' \u2014 ' + l.url;
+    s.textContent = l.desc || '';
     li.append(b, s);
     const btns = document.createElement('div'); btns.className = 'rowbtns';
     const ed = document.createElement('button'); ed.type = 'button'; ed.textContent = 'Edit';
@@ -493,16 +484,19 @@ function render(){
 
 function startEdit(l){
   editingId = l.id;
-  selected = l.imdb ? { imdb: l.imdb, type: l.type, name: l.name, year: '', poster: '' } : null;
+  selected = l.imdb ? { imdb: l.imdb, type: l.type, name: l.name, year: '', poster: l.poster || '' } : null;
   $('fDesc').value = l.desc || '';
   $('fUrl').value = l.url;
+  $('epSwitch').setAttribute('aria-checked', String(!(selected && l.se)));
+  $('fSe').value = (selected && l.se) ? l.se : '';
+  $('fEp').value = (selected && l.se) ? l.ep : '';
   $('formTitle').textContent = 'Edit link';
   $('formDesc').textContent = l.imdb
     ? 'Change the description or the video link, then save.'
     : 'This is an old link that is not attached yet — search the title above and select it to attach it.';
   $('add').textContent = 'Save changes';
   $('cancel').hidden = false;
-  renderSelected();
+  renderSelected(); updateEpUI();
   setMsg('msg', '');
   if(!selected) $('q').focus(); else $('fDesc').focus();
 }
@@ -510,26 +504,36 @@ function stopEdit(){
   editingId = null;
   selected = null;
   $('fDesc').value = ''; $('fUrl').value = '';
+  $('epSwitch').setAttribute('aria-checked', 'true');
+  $('fSe').value = ''; $('fEp').value = '';
   $('formTitle').textContent = 'Add the link';
   $('formDesc').textContent = 'It will appear as a play card on the title you selected above.';
   $('add').textContent = 'Add link';
   $('cancel').hidden = true;
-  renderSelected();
+  renderSelected(); updateEpUI();
 }
 
 function handleAuth(e){
-  if(e.status === 401){ show('login'); setMsg('lMsg', 'Session expired. Enter your password again.', 'err'); }
-  else setMsg('msg', e.message, 'err');
+  acct = null;
+  showAuth();
+  setMsg('aMsg', 'Session expired. Log in again.', 'err');
 }
 
 $('add').onclick = async () => {
   const desc = $('fDesc').value.trim(), url = $('fUrl').value.trim();
   if(!selected) return setMsg('msg', 'Search the movie or series by name and select it first.', 'err');
   if(!desc) return setMsg('msg', 'Enter the description.', 'err');
-  const payload = { id: editingId, imdb: selected.imdb, type: selected.type, metaName: selected.name, desc, url };
+  let se = null, ep = null;
+  if(selected.type === 'series' && !epSwitchOn()){
+    se = Number($('fSe').value); ep = Number($('fEp').value);
+    if(!Number.isInteger(se) || !Number.isInteger(ep) || se < 1 || ep < 1 || se > 999 || ep > 999){
+      return setMsg('msg', 'Enter the season and episode numbers (1-999).', 'err');
+    }
+  }
+  const payload = { id: editingId, imdb: selected.imdb, type: selected.type, metaName: selected.name, desc, url, poster: selected.poster || '', se, ep };
   try{
     links = await call(editingId ? 'update' : 'add', payload);
-    setMsg('msg', editingId ? 'Changes saved.' : 'Link added.', 'ok');
+    showToast(editingId ? 'Changes saved' : 'Link added');
     stopEdit(); render();
   }catch(e){ handleAuth(e); }
 };
@@ -540,7 +544,7 @@ let pendingDelete = null;
 function askDelete(l){
   pendingDelete = l;
   $('delName').textContent = l.imdb ? l.name : l.title;
-  $('delUrl').textContent = l.url;
+  $('delDesc').textContent = l.desc || '';
   $('delOverlay').classList.add('open');
   $('delCancel').focus();
 }
@@ -553,6 +557,7 @@ $('delConfirm').onclick = async () => {
   try{
     links = await call('delete', { id: l.id });
     if(editingId === l.id) stopEdit();
+    showToast('Link deleted');
     render();
   }catch(e){ handleAuth(e); }
 };
@@ -562,17 +567,28 @@ document.addEventListener('keydown', e => {
 
 /* ---------- install ---------- */
 $('copy').onclick = async () => {
-  const u = location.origin + '/@' + user + '/manifest.json';
-  try{ await navigator.clipboard.writeText(u); setMsg('msg', 'Install URL copied.', 'ok'); }
+  const u = location.origin + '/@' + acct + '/manifest.json';
+  try{ await navigator.clipboard.writeText(u); showToast('Link copied'); }
   catch{ prompt('Copy this URL', u); }
 };
 
 $('logout').onclick = async () => {
   try{ await call('logout'); }catch(e){}
-  location.reload(); // cookie cleared -> the password screen comes back
+  location.reload(); // cookie cleared -> the login screen comes back
 };
 
-if(user) startUser(); else startHome();
+/* ---------- boot: valid cookie -> straight in, else the login form ---------- */
+(async () => {
+  const mn = location.pathname.match(/^\/@([A-Za-z0-9_]{3,20})(?:\/configure)?\/?$/);
+  if(mn){
+    acct = mn[1].toLowerCase();
+    try{
+      links = await call('list');
+      return showApp();
+    }catch(e){ acct = null; }
+  }
+  showAuth();
+})();
 </script>
 </body>
 </html>
