@@ -9,6 +9,7 @@
 // description = the text pasted when adding the link.
 // When a title has no link, a card saying "no link added in this title" is
 // always shown — there is no setting to turn it off.
+const crypto = require('crypto');
 const L = require('./_lib');
 
 
@@ -38,6 +39,15 @@ function toStream(l) {
   return stream;
 }
 
+// Every account has a secret install key: /@name/<key>/manifest.json. Once an
+// account has a key, URLs without it (or with a wrong one) are refused. Accounts
+// that never opened their page yet have no key and keep working the old way.
+function keyOk(user, k) {
+  if (!user.key) return true;
+  try { return crypto.timingSafeEqual(Buffer.from(String(user.key)), Buffer.from(String(k || ''))); }
+  catch (_) { return false; }
+}
+
 function baseUrl(req) {
   const host = String(req.headers['x-forwarded-host'] || req.headers.host || '').split(',')[0].trim();
   return /^[a-z0-9.-]+(:\d+)?$/i.test(host) ? `https://${host}` : 'https://stremio-custom-links.vercel.app';
@@ -60,12 +70,13 @@ module.exports = async (req, res) => {
   try {
     const user = await L.getUser(name);
     if (!user) return L.send(res, 404, { error: 'User not found' });
+    if (!keyOk(user, q.k)) return L.send(res, 404, { error: 'Not found. This install URL is outdated or wrong: open your page and copy the current one.' });
     const links = user.links || [];
 
     if (route === 'manifest') {
       return L.send(res, 200, {
         id: `community.custom.links.${name}`,
-        version: '5.5.0',
+        version: '5.6.0',
         name: `Custom Links @${name}`,
         description: `Your own video links attached to movies and series by @${name}.`,
         resources: [
