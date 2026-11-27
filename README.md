@@ -1,4 +1,4 @@
-# Stremio Custom Links (v5.4.1)
+# Stremio Custom Links (v5.5.0)
 
 A Stremio addon (works in Nuvio too) to attach your own video links to movies and series. Titles are found by **searching the name** (IMDb suggestions first, then Cinemeta). The addon has **no catalog and no poster of its own** — every link plays directly on the original movie/series card. Every user gets a personal page and install URL, protected by their own password. Built without the Stremio addon SDK.
 
@@ -21,6 +21,16 @@ A series link shows on every episode by default; turn off **All episodes** to pi
 ## Login sessions
 
 After the first password login the server sets an HttpOnly cookie (30 days). Page reloads, the bare `/` URL and later visits never ask for the password again (`/api/me` checks the cookie). **Logout** (or a missing cookie) brings the login form back. Password attempts are still rate-limited (10 per 15 minutes).
+
+## Subtitles (file info)
+
+Stremio passes `videoHash`, `videoSize` and `filename` to subtitle addons (OpenSubtitles etc.) so they can find subtitles for this exact file. After a link is saved, the server reads them from the video URL with HTTP **Range** requests (about 128 KB, never the whole file) and stores them on the link:
+
+- **size** : from `Content-Range` / `Content-Length`
+- **hash** : OpenSubtitles hash (first + last 64 KB of the file)
+- **filename** : the description if it looks like a file name, else the name from `Content-Disposition` / the URL
+
+The host must answer Range requests (most do). If it does not, only the size is saved ("No hash" tag). **Check file info** on the page reads the info for links that have none (older links). Private/local addresses are never fetched.
 
 ## Deploy
 
