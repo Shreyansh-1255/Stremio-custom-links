@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="referrer" content="no-referrer">
 <title>Custom Links for Stremio &amp; Nuvio</title>
 <meta name="theme-color" content="#100e0c">
@@ -15,7 +15,7 @@
   --radius-s:6px; --radius-m:10px;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html{margin:0;padding:0;-webkit-text-size-adjust:100%}
+html{touch-action:pan-x pan-y;margin:0;padding:0}
 body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;line-height:1.5;min-height:100vh;margin:0;padding:0}
 button{font-family:inherit;cursor:pointer}
 button,.switch,.pills button,.rowbtns button,.s-clear,.chip>button,.list-row,.rowbtns,.actions .btn{
@@ -102,8 +102,6 @@ select option{background:var(--surface-2);color:var(--text)}
 .chip>button svg{width:13px;height:13px;stroke:var(--muted)}
 
 /* ---------- links list: poster + name + description only ---------- */
-.link-row{border-bottom:1px solid var(--line)}
-.link-row:last-child{border-bottom:0}
 .link-row .li b{font-family:'Fraunces',serif;font-weight:600;font-size:15px;line-height:1.3;display:block}
 .link-row .li small{display:block;color:var(--muted);font-size:11.5px;margin-top:4px;line-height:1.45}
 .rowbtns button{height:32px;padding:0 12px;border-radius:8px;border:1px solid var(--line);background:var(--surface-2);color:var(--text);font-size:12px;font-weight:600}
@@ -163,18 +161,19 @@ input:focus-visible,textarea:focus-visible,select:focus-visible{outline:none}
 
 /* links list (overrides) */
 .filter{margin-bottom:6px}
-.link-row{display:grid;grid-template-columns:44px minmax(0,1fr);gap:8px 12px;align-items:start;padding:14px 0}
-.link-row .li{min-width:0}
+.link-row{display:flex;gap:12px;align-items:stretch;padding:10px;margin-top:10px;background:var(--surface-2);border:1px solid var(--line);border-radius:12px}
+.link-row .list-thumb{width:100px;height:150px;border-radius:8px;align-self:flex-start}
+.link-row .list-thumb svg{max-width:34px}
+.link-row .li{flex:1;min-width:0;display:flex;flex-direction:column}
 .link-row .li b,.link-row .li small{overflow-wrap:anywhere;word-break:break-word}
-.link-row .li b{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.link-row .li b{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-top:1px}
 .link-row .li small.d{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .link-row .li small.host{font-size:11px;opacity:.7;margin-top:3px}
 .tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:5px}
 .tags .count{margin:0;padding:1px 8px}
-.rowbtns{grid-column:2;display:grid;grid-template-columns:repeat(3,1fr);gap:6px;align-self:auto}
-.rowbtns button{height:34px;padding:0 6px}
+.rowbtns{margin-top:auto;padding-top:10px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.rowbtns button{height:32px;padding:0 4px;font-size:11.5px;white-space:nowrap}
 .more{display:block;width:100%;margin-top:10px}
-@media (max-width:600px){input,textarea,select{font-size:16px}.search-row input{font-size:16px}}
 #clToast.err{border-color:var(--danger-ink)}
 @media (max-width:400px){ main{padding:20px 12px 56px} .card{padding:14px} }
 </style>
@@ -230,7 +229,7 @@ input:focus-visible,textarea:focus-visible,select:focus-visible{outline:none}
 
     <section class="card">
       <h2>Search a movie or series</h2>
-      <p class="desc">Found on Cinemeta — the same titles Stremio and Nuvio show.</p>
+      <p class="desc">Suggestions from IMDb and Cinemeta — the same titles Stremio and Nuvio show.</p>
       <div class="search-row">
         <svg class="mag" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg>
         <input id="q" placeholder="Titles, e.g. The Shawshank Redemption" maxlength="100" autocomplete="off" enterkeyhint="search">
@@ -297,6 +296,7 @@ input:focus-visible,textarea:focus-visible,select:focus-visible{outline:none}
       <div class="static urlbox" id="manifestUrl"></div>
       <div class="actions">
         <a class="btn primary" id="open">Install in Stremio</a>
+        <a class="btn primary" id="openNuvio">Install in Nuvio</a>
         <button class="btn" id="copy">Copy URL</button>
       </div>
       <p class="note">Anyone with your URL can see your links, but not change them.</p>
@@ -433,8 +433,13 @@ function showApp(){
   const path = '/@' + acct + '/manifest.json';
   $('manifestUrl').textContent = location.origin + path;
   $('open').href = 'stremio://' + location.host + path;
+  $('openNuvio').href = 'nuvio://' + location.host + path;
 }
+const LAST_KEY = 'cl_last_user';
+function rememberUser(n){ try{ localStorage.setItem(LAST_KEY, n); }catch(_){} }
+function lastUser(){ try{ const v = localStorage.getItem(LAST_KEY) || ''; return /^[a-z0-9_]{3,20}$/.test(v) ? v : null; }catch(_){ return null; } }
 function afterAuth(){
+  rememberUser(acct);
   if(pathName() !== acct) history.replaceState(null, '', '/@' + acct);
   showApp();
 }
@@ -596,7 +601,7 @@ function fillEpSelects(){
   epSeasons.forEach(se => {
     const o = document.createElement('option');
     o.value = String(se.s);
-    o.textContent = 'Season ' + se.s + ' (' + se.eps.length + ')';
+    o.textContent = 'Season ' + se.s;
     ss.appendChild(o);
   });
   const want = (epWant && [...ss.options].some(o => o.value === String(epWant.se))) ? String(epWant.se) : (ss.options[0] ? ss.options[0].value : null);
@@ -722,7 +727,8 @@ function render(){
     const del = document.createElement('button'); del.type = 'button'; del.className = 'del'; del.textContent = 'Delete';
     del.onclick = () => askDelete(l);
     btns.append(ed, cp, del);
-    row.append(li, btns);
+    li.appendChild(btns);
+    row.append(li);
     list.appendChild(row);
   });
   if(all.length > shown){
@@ -848,29 +854,41 @@ $('logout').onclick = async () => {
 
 /* ---------- boot ----------
    /@name  -> valid cookie: straight into the manager, else login form (name filled in)
-   /       -> valid cookie: auto-login and move to /@name, else login form */
+   /       -> valid cookie: auto-login and move to /@name, else login form.
+              The username comes from /api/me (cookie); if that is unavailable it falls
+              back to the last username used on this device, and the cookie is checked
+              through /api/links. */
 (async () => {
   const pn = pathName();
-  try{
-    if(pn){
-      acct = pn;
+  if(pn){
+    acct = pn;
+    try{
       links = await call('list');
+      rememberUser(acct);
       return showApp();
+    }catch(e){
+      acct = null;
+      if(e.status === 404) return showAuth(pn, 'register', 'No account @' + pn + ' yet. Choose a password to create it.', 'err');
+      if(e.status === 0 || e.status >= 500) return showAuth(pn, 'login', e.message, 'err');
+      return showAuth(pn, 'login');
     }
-    const me = await fetch('/api/me').then(r => r.json()).catch(() => ({}));
-    if(me && me.name){
-      acct = me.name;
+  }
+  let name = null;
+  try{ const me = await fetch('/api/me', { cache: 'no-store' }).then(r => r.json()); name = me && me.name; }catch(_){}
+  if(!name) name = lastUser();
+  if(name){
+    acct = name;
+    try{
       links = await call('list');
+      rememberUser(acct);
       history.replaceState(null, '', '/@' + acct);
       return showApp();
+    }catch(e){
+      acct = null;
+      if(e.status === 0 || e.status >= 500) return showAuth(name, 'login', e.message, 'err');
     }
-  }catch(e){
-    acct = null;
-    if(e.status === 404) return showAuth(pn, 'register', 'No account @' + pn + ' yet. Choose a password to create it.', 'err');
-    if(e.status === 0 || e.status >= 500) return showAuth(pn, 'login', e.message, 'err');
   }
-  acct = null;
-  showAuth(pn, 'login');
+  showAuth(lastUser(), 'login');
 })();
 </script>
 </body>
